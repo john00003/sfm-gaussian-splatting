@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/CMakeFiles/sfm_ceres.dir/embed.manifest"

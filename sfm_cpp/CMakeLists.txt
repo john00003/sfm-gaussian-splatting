@@ -36,7 +36,7 @@ find_package(Ceres REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Pangolin REQUIRED)
-find_package(Exiv2 REQUIRED)
+find_package(exiv2 CONFIG REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 
@@ -64,7 +64,7 @@ target_link_libraries(sfm_ceres
   glfw
   GLEW::GLEW
   ImGui
-  exiv2
+  Exiv2::exiv2lib
 )
 
 if (APPLE)

@@ -1,0 +1,3 @@
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/_deps/imgui-subbuild/CMakeFiles/imgui-populate.dir
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/_deps/imgui-subbuild/CMakeFiles/edit_cache.dir
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/_deps/imgui-subbuild/CMakeFiles/rebuild_cache.dir

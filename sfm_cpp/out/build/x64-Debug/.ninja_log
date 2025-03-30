@@ -1,0 +1,14 @@
+# ninja log v6
+37	409	7650517648120277	CMakeFiles/ImGui.dir/_deps/imgui-src/imgui_tables.cpp.obj	3b0ce0a4acb4af37
+57	421	7650517648320326	CMakeFiles/ImGui.dir/_deps/imgui-src/backends/imgui_impl_opengl3.cpp.obj	d7902d68d7f1ad39
+43	447	7650517648180294	CMakeFiles/ImGui.dir/_deps/imgui-src/imgui_demo.cpp.obj	d965979c3350ba9c
+24	500	7650517647990254	CMakeFiles/ImGui.dir/_deps/imgui-src/imgui_draw.cpp.obj	a3d188692aca1ecb
+30	560	7650517648050266	CMakeFiles/ImGui.dir/_deps/imgui-src/imgui_widgets.cpp.obj	18d4823b7cbe7c4d
+50	621	7650517648250311	CMakeFiles/ImGui.dir/_deps/imgui-src/backends/imgui_impl_glfw.cpp.obj	edba3a9d4bbcfece
+78	694	7650517648530366	CMakeFiles/sfm_ceres.dir/src/gui.cpp.obj	80eb5c578f45388d
+16	848	7650517647910231	CMakeFiles/ImGui.dir/_deps/imgui-src/imgui.cpp.obj	783e64bc17ed8eb9
+849	915	7650517656232100	ImGui.lib	68f7daa5557cfee3
+71	2422	7650517648460354	CMakeFiles/sfm_ceres.dir/src/viewer.cpp.obj	3e6d87558c397076
+64	3921	7650517648390335	CMakeFiles/sfm_ceres.dir/src/main.cpp.obj	e3788184ce7bd7bc
+85	4237	7650517648600391	CMakeFiles/sfm_ceres.dir/src/sfm_system.cpp.obj	4b4685e55f60830b
+4239	5992	7650517690129728	sfm_ceres.exe	6d4d78e7736caa98
