@@ -120,7 +120,7 @@ void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, 
     poses.push_back(pose2);
 }
 
-void runSfMOnly() {
+void runSfMOnly(char *folder) {
     SfMMap map;
     std::vector<Eigen::Vector3d> current_points;
     std::vector<Eigen::Matrix4d> current_poses;
@@ -230,8 +230,19 @@ int main(int argc, char** argv)
 
     if (argc > 1) {
         if (strcmp(argv[1], "--no_gui") == 0) {
-            runSfMOnly();
-            return 0;
+            if (argc == 3) {
+                runSfMOnly();
+                return 0;
+            }
+            else {
+                cerr << "Must provide folder with --no_gui flag! Exiting.\n";
+                return -1;
+            }
+            
+        }
+        else {
+            cerr << "First argument must be --no_gui! Exiting.\n";
+            return -1;
         }
     }
 

@@ -737,9 +737,9 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     int result = std::system(script.c_str());
 
     if (result != 0) {
-        std::cerr << "Error while converting camera, images, and 3D point files, and converting them to binary." << std::endl;
+        std::cerr << "Error while converting camera, images, and 3D point files, and converting them to binary.\n" << std::endl;
     }
     else {
-        std::cout << "Successfully read camera, images, and 3D point files, and converted them to binary." << std::endl;
+        std::cout << "Successfully read camera, images, and 3D point files, and converted them to binary.\n" << std::endl;
     }
 }
