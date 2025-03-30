@@ -42,6 +42,7 @@ public:
     void TriangulateNewPoints(int view_id);
     void BundleAdjust();
     void LocalBundleAdjust(int current_view_id);
+    void GenerateCOLMAPOutput();
 
 private:
     SfMMap& map_;

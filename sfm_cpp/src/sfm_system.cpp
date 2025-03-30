@@ -9,6 +9,9 @@
 #include <set>
 #include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
 
 bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K) {
     try {
@@ -675,5 +678,68 @@ void IncrementalSfM::LocalBundleAdjust(int current_view_id) {
 
     for (size_t i = 0; i < map_.tracks.size(); ++i) {
         map_.tracks[i].point = Eigen::Vector3d(points[i][0], points[i][1], points[i][2]);
+    }
+}
+
+void IncrementalSfM::GenerateCOLMAPOutput(){
+    // Assumptions:
+    //    - all photos were taken from the same camera
+    //		- this means that any View in the SfMMap will have the same intrinsics
+    //		- we can just get map_.views.first as our representative view
+    //		[f 0 px]
+    //		[0 f py]
+    //		[0 0 1 ]
+
+    std::ofstream cameraFile;
+    // open cameras.txt
+    cameraFile.open("cameras.txt");
+    // TODO: check if we should use pinhole or opencv cam. gaussian splat wants pinhole, but do we need to do further conversion?
+    // TODO: is GetIntrinsicsFromExif used anywhere?
+    View representative_cam = map_.views.begin()->second;
+    cv::Mat intrinsics = representative_cam.K;
+    cameraFile << 1 << " SIMPLE_PINHOLE " << representative_cam.image.cols << " " << representative_cam.image.rows << " " << intrinsics.at<float>(0, 0) << " " << intrinsics.at<float>(0, 2) << " " << intrinsics.at<float>(1, 2) << "\n";
+    cameraFile.close();
+    
+    std::ofstream imageFile;
+    imageFile.open("images.txt");
+    // open images.txt
+    // iterate through map_.views
+    // for (auto it = num_map.begin(); it != num_map.end(); ++it)
+    for (auto it = map_.views.begin(); it != map_.views.end(); ++it) {
+        View view = it->second;
+        Eigen::Quaterniond q(view.pose.block<3,3>(0,0));
+        imageFile << view.id << " " << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << " " << view.pose(0, 3) << " " << view.pose(1, 3) << " " << view.pose(2, 3) << " " << 1 << " " << view.image_path << "\n";
+    }
+    imageFile.close();
+
+    // open points3D.txt
+    std::ofstream points3DFile;
+    points3DFile.open("points3D.txt");
+    int id = 0;
+    // initialize counter to assign 3D point IDs
+        // TODO: see if 3D points already have IDs
+    
+    for (const Track& track : map_.tracks) {
+        // TODO: get RGB value or initialize to some random color
+        // TODO: get error
+        int R = 255, G = R, B = R;
+        int error = 0;
+        points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
+        for (const std::pair<int, int>& observation : track.observations) {
+            points3DFile << " " << observation.first << " " << observation.second;
+        }
+        points3DFile << "\n";
+        ++id;
+    }
+    points3DFile.close();
+
+    std::string script = "python3 convert_script.py"; // TODO: modify with args for file name specification if needed
+    int result = std::system(script.c_str());
+
+    if (result != 0) {
+        std::cerr << "Error while converting camera, images, and 3D point files, and converting them to binary." << std::endl;
+    }
+    else {
+        std::cout << "Successfully read camera, images, and 3D point files, and converted them to binary." << std::endl;
     }
 }
