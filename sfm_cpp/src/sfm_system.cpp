@@ -539,7 +539,7 @@ void IncrementalSfM::BundleAdjust() {
     options.linear_solver_type = ceres::SPARSE_SCHUR;
     options.num_threads = 12;
     options.minimizer_progress_to_stdout = true;
-    options.max_num_iterations = 100;
+    options.max_num_iterations = 1000;
     options.function_tolerance = 1e-5;
     options.gradient_tolerance = 1e-6;
     options.parameter_tolerance = 1e-8;
@@ -653,7 +653,7 @@ void IncrementalSfM::LocalBundleAdjust(int current_view_id) {
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::SPARSE_SCHUR;
     options.num_threads = 12;
-    options.max_num_iterations = 30;
+    options.max_num_iterations = 300;
     options.minimizer_progress_to_stdout = true;
 
     ceres::Solver::Summary summary;
@@ -722,18 +722,37 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     for (const Track& track : map_.tracks) {
         // TODO: get RGB value or initialize to some random color
         // TODO: get error
-        int R = 255, G = R, B = R;
+        std::vector<cv::Vec3b> colors; // we track the average color across all images
+        // TODO: check if observation keys are correct that we use for maps
+        for (const std::pair<int, int>& observation : track.observations) {
+            View view = map_.views[observation.first];
+            cv::KeyPoint kp = view.keypoints[observation.second];
+            cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
+            colors.push_back(bgr);
+        }
+        int R, G, B, n;
+        for (auto it = colors.begin(); it != colors.end(); ++it) {
+            ++n;
+            B += (*it)[0];
+            G += (*it)[1];
+            R += (*it)[2];
+        }
+
+        B /= n;
+        G /= n;
+        R /= n;
+        
         int error = 0;
         points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
         for (const std::pair<int, int>& observation : track.observations) {
-            points3DFile << " " << observation.first << " " << observation.second;
+            points3DFile << " " << observation.first << " " << observation.second;  // TODO: ensure this is same order as COLMAP
         }
         points3DFile << "\n";
         ++id;
     }
     points3DFile.close();
 
-    std::string script = "python3 convert_script.py"; // TODO: modify with args for file name specification if needed
+    std::string script = "python convert_script.py"; // TODO: modify with args for file name specification if needed
     int result = std::system(script.c_str());
 
     if (result != 0) {
