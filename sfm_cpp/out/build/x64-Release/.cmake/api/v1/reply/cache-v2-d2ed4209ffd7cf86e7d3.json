@@ -2,6 +2,66 @@
 	"entries" : 
 	[
 		{
+			"name" : "AMD_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for AMD."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/AMD"
+		},
+		{
+			"name" : "BUILD_SHARED_LIBS",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "OFF"
+				}
+			],
+			"type" : "BOOL",
+			"value" : "OFF"
+		},
+		{
+			"name" : "CAMD_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for CAMD."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/CAMD"
+		},
+		{
+			"name" : "CCOLAMD_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for CCOLAMD."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/CCOLAMD"
+		},
+		{
+			"name" : "CHOLMOD_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for CHOLMOD."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/CHOLMOD"
+		},
+		{
 			"name" : "CMAKE_AR",
 			"properties" : 
 			[
@@ -1118,6 +1178,18 @@
 			"value" : "FALSE"
 		},
 		{
+			"name" : "COLAMD_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for COLAMD."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/COLAMD"
+		},
+		{
 			"name" : "Ceres_DIR",
 			"properties" : 
 			[
@@ -1522,6 +1594,18 @@
 			"value" : ""
 		},
 		{
+			"name" : "SPQR_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SPQR."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/SPQR"
+		},
+		{
 			"name" : "SfmCeresDemo_BINARY_DIR",
 			"properties" : 
 			[
@@ -1556,6 +1640,66 @@
 			],
 			"type" : "STATIC",
 			"value" : "C:/github-repos/sfm-gaussian-splatting/sfm_cpp"
+		},
+		{
+			"name" : "SuiteSpare_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SuiteSpare."
+				}
+			],
+			"type" : "PATH",
+			"value" : "SuiteSpare_DIR-NOTFOUND"
+		},
+		{
+			"name" : "SuiteSparseConfig_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SuiteSparseConfig."
+				}
+			],
+			"type" : "PATH",
+			"value" : "SuiteSparseConfig_DIR-NOTFOUND"
+		},
+		{
+			"name" : "SuiteSparseLAPACK_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SuiteSparseLAPACK."
+				}
+			],
+			"type" : "PATH",
+			"value" : "SuiteSparseLAPACK_DIR-NOTFOUND"
+		},
+		{
+			"name" : "SuiteSparse_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SuiteSparse."
+				}
+			],
+			"type" : "PATH",
+			"value" : "SuiteSparse_DIR-NOTFOUND"
+		},
+		{
+			"name" : "SuiteSparse_config_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for SuiteSparse_config."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/github-repos/vcpkg/installed/x64-windows/share/SuiteSparse_config"
 		},
 		{
 			"name" : "TIFF_INCLUDE_DIR",

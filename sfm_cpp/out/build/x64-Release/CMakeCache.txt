@@ -14,6 +14,21 @@
 # EXTERNAL cache entries
 ########################
 
+//The directory containing a CMake configuration file for AMD.
+AMD_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/AMD
+
+//OFF
+BUILD_SHARED_LIBS:BOOL=OFF
+
+//The directory containing a CMake configuration file for CAMD.
+CAMD_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/CAMD
+
+//The directory containing a CMake configuration file for CCOLAMD.
+CCOLAMD_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/CCOLAMD
+
+//The directory containing a CMake configuration file for CHOLMOD.
+CHOLMOD_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/CHOLMOD
+
 //Path to a program.
 CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/lib.exe
 
@@ -198,6 +213,9 @@ CMAKE_TOOLCHAIN_FILE:FILEPATH=C:/github-repos/vcpkg/scripts/buildsystems/vcpkg.c
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//The directory containing a CMake configuration file for COLAMD.
+COLAMD_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/COLAMD
+
 //The directory containing a CMake configuration file for Ceres.
 Ceres_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/ceres
 
@@ -251,6 +269,9 @@ Protobuf_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/protobuf
 //Path to a program.
 Protobuf_PROTOC_EXECUTABLE:FILEPATH=C:/github-repos/vcpkg/installed/x64-windows/tools/protobuf/protoc.exe
 
+//The directory containing a CMake configuration file for SPQR.
+SPQR_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/SPQR
+
 //Value Computed by CMake
 SfmCeresDemo_BINARY_DIR:STATIC=C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Release
 
@@ -259,6 +280,21 @@ SfmCeresDemo_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 SfmCeresDemo_SOURCE_DIR:STATIC=C:/github-repos/sfm-gaussian-splatting/sfm_cpp
+
+//The directory containing a CMake configuration file for SuiteSpare.
+SuiteSpare_DIR:PATH=SuiteSpare_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for SuiteSparseConfig.
+SuiteSparseConfig_DIR:PATH=SuiteSparseConfig_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for SuiteSparseLAPACK.
+SuiteSparseLAPACK_DIR:PATH=SuiteSparseLAPACK_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for SuiteSparse.
+SuiteSparse_DIR:PATH=SuiteSparse_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for SuiteSparse_config.
+SuiteSparse_config_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/share/SuiteSparse_config
 
 //Path to a file.
 TIFF_INCLUDE_DIR:PATH=C:/github-repos/vcpkg/installed/x64-windows/include
