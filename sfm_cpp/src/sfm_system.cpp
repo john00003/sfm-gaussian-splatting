@@ -168,17 +168,35 @@ void IncrementalSfM::Initialize() {
 
     for (auto& [id, view] : map_.views) {
         if (view.keypoints.empty()) {
+            std::cout << "[INFO] Detecting key points with sift for view " << id << std::endl;
             sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
         }
     }
 
     for (auto it1 = map_.views.begin(); it1 != map_.views.end(); ++it1) {
         for (auto it2 = std::next(it1); it2 != map_.views.end(); ++it2) {
-            const auto& v1 = it1->second;
-            const auto& v2 = it2->second;
+            // TODO: did they have to be const?
+            auto& v1 = it1->second;
+            auto& v2 = it2->second;
+            std::cout << "[INFO] Matching key points in view " << v1.id << " to view " << v2.id << std::endl;
 
             std::vector<std::vector<cv::DMatch>> knn;
             matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
+            // TODO: will matches work for both images like this? will order be correct?
+            v1.matches_map[v2.id] = knn;
+            // we reverse the matches to give to view 2
+            std::vector<std::vector<cv::DMatch>> reversed_knn;
+
+            for (int i = 0; i < knn.size(); ++i) {
+                std::vector<cv::DMatch> matches;
+                for (int j = 0; j < knn[i].size(); ++j) {
+                    
+                    matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
+                }
+                reversed_knn.push_back(matches);
+            }
+
+            v2.matches_map[v1.id] = reversed_knn;
 
             size_t good = 0;
             for (const auto& m : knn) {
@@ -206,8 +224,9 @@ void IncrementalSfM::Initialize() {
 }
 
 void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
-    std::vector<std::vector<cv::DMatch>> knn;
-    matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
+    std::vector<std::vector<cv::DMatch>> knn = v1.matches_map[v2.id];
+    //std::vector<std::vector<cv::DMatch>> knn;
+    //matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
 
     std::vector<cv::DMatch> good;
     for (auto& m : knn) {
@@ -295,6 +314,8 @@ void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
                 track.observations.push_back({v1.id, dm.queryIdx});
                 track.observations.push_back({v2.id, dm.trainIdx});
                 map_.tracks.push_back(track);
+                v1.points_3d.push_back(std::pair<int, int>(dm.queryIdx, i));
+                v2.points_3d.push_back(std::pair<int, int>(dm.trainIdx, i));
                 ++valid;
                 break;
             }
@@ -307,10 +328,11 @@ void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
 }
 
 std::vector<cv::DMatch> IncrementalSfM::MatchAndFilterKNN(
-    const cv::Mat& desc1, const cv::Mat& desc2) const
+    const cv::Mat& desc1, const cv::Mat& desc2, View v1, View v2) const
 {
-    std::vector<std::vector<cv::DMatch>> knn;
-    matcher_.knnMatch(desc1, desc2, knn, 2);
+    //std::vector<std::vector<cv::DMatch>> knn;
+    //matcher_.knnMatch(desc1, desc2, knn, 2);
+    std::vector<std::vector<cv::DMatch>> knn = v1.matches_map[v2.id];
 
     std::vector<cv::DMatch> good;
     good.reserve(knn.size());
@@ -327,19 +349,21 @@ bool IncrementalSfM::RegisterNextView(int view_id) {
     if(view.registered) {
         return false;
     }
-
-    sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
+    // TODO: why do we do this again? we already do this in initialize
+    std::cout << "[INFO] Detecting key points with sift for view " << view_id << std::endl;
+    //sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
 
     std::vector<cv::Point3f> pts3D;
     std::vector<cv::Point2f> pts2D;
     pts3D.reserve(5000);
     pts2D.reserve(5000);
 
+    std::cout << "[INFO] Beginning matching process for view " << view_id << std::endl;
     for (auto& kv : map_.views) {
         auto& reg_view = kv.second;
         if(!reg_view.registered) continue;
-
-        auto good_matches = MatchAndFilterKNN(view.descriptors, reg_view.descriptors);
+        std::cout << "[INFO] Matching with view " << reg_view.id << std::endl;
+        auto good_matches = MatchAndFilterKNN(view.descriptors, reg_view.descriptors, view, reg_view);
 
         for (auto &m : good_matches) {
             int matched_kp_idx = m.trainIdx;
@@ -350,7 +374,8 @@ bool IncrementalSfM::RegisterNextView(int view_id) {
                         Eigen::Vector3d ept = map_.tracks[tid].point;
                         pts3D.push_back(cv::Point3f(ept[0], ept[1], ept[2]));
                         pts2D.push_back(view.keypoints[m.queryIdx].pt);
-                        map_.AddObservation(view_id, m.queryIdx, (int)tid);                        
+                        map_.AddObservation(view_id, m.queryIdx, (int)tid);
+                        view.points_3d.push_back(std::pair<int, int>(m.queryIdx, (int)tid));
                         found = true;
                         break;
                     }
@@ -359,6 +384,7 @@ bool IncrementalSfM::RegisterNextView(int view_id) {
             }
         }
     }
+    std::cout << "[INFO] Matching process finished for view " << view_id << std::endl;
 
     if(pts3D.size() < 10) {
         std::cerr << "[WARN] View " << view_id << " doesn't have enough 2D-3D matches to solvePnP." << std::endl;
@@ -366,6 +392,7 @@ bool IncrementalSfM::RegisterNextView(int view_id) {
     }
 
     cv::Mat rvec, tvec, inliers;
+    std::cout << "[INFO] Solving PnP optimization for view " << view_id << std::endl;
     bool ok = cv::solvePnPRansac(pts3D, pts2D, view.K, cv::noArray(),
                                  rvec, tvec, false,
                                  100, 8.0F, 0.99, inliers);
@@ -401,8 +428,9 @@ void IncrementalSfM::TriangulateNewPoints(int view_id) {
     for(auto& kv : map_.views) {
         auto& v2 = kv.second;
         if(!v2.registered || v2.id == view_id) continue;
-
-        auto good_matches = MatchAndFilterKNN(view.descriptors, v2.descriptors);
+        // TODO: havent they already been matched? both in register new view and initialize?
+            // can we reuse the computed matches?
+        auto good_matches = MatchAndFilterKNN(view.descriptors, v2.descriptors, view, v2);
 
         for (auto &m : good_matches) {
             int qidx = m.queryIdx;
@@ -451,6 +479,7 @@ void IncrementalSfM::TriangulateNewPoints(int view_id) {
 
             std::vector<cv::Point2f> vpt1 = {pt1}, vpt2 = {pt2};
             cv::Mat pt4D;
+            std::cout << "[INFO] Invoking CV triangulation" << std::endl;
             cv::triangulatePoints(P1, P2, vpt1, vpt2, pt4D);
 
             cv::Mat x = pt4D.col(0);
@@ -690,6 +719,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     //		[0 f py]
     //		[0 0 1 ]
 
+    std::cout << "[INFO] Writing cameras.txt" << std::endl;
     std::ofstream cameraFile;
     // open cameras.txt
     cameraFile.open("cameras.txt");
@@ -700,6 +730,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     cameraFile << 1 << " SIMPLE_PINHOLE " << representative_cam.image.cols << " " << representative_cam.image.rows << " " << intrinsics.at<float>(0, 0) << " " << intrinsics.at<float>(0, 2) << " " << intrinsics.at<float>(1, 2) << "\n";
     cameraFile.close();
     
+    std::cout << "[INFO] Writing images.txt" << std::endl;
     std::ofstream imageFile;
     imageFile.open("images.txt");
     // open images.txt
@@ -709,9 +740,14 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
         View view = it->second;
         Eigen::Quaterniond q(view.pose.block<3,3>(0,0));
         imageFile << view.id << " " << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << " " << view.pose(0, 3) << " " << view.pose(1, 3) << " " << view.pose(2, 3) << " " << 1 << " " << view.image_path << "\n";
+        for (auto it1 = view.points_3d.begin(); it1 != view.points_3d.end(); ++it1) {
+            imageFile << view.keypoints[it1->first].pt.x << " " << view.keypoints[it1->first].pt.y << " " << it1->second << " ";
+        }
+        imageFile << "\n";
     }
     imageFile.close();
 
+    std::cout << "[INFO] Writing points3D.txt" << std::endl;
     // open points3D.txt
     std::ofstream points3DFile;
     points3DFile.open("points3D.txt");
@@ -730,7 +766,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
             cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
             colors.push_back(bgr);
         }
-        int R, G, B, n;
+        int R = 0, G = 0, B = 0, n = 0;
         for (auto it = colors.begin(); it != colors.end(); ++it) {
             ++n;
             B += (*it)[0];
@@ -741,6 +777,8 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
         B /= n;
         G /= n;
         R /= n;
+
+        //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
         
         int error = 0;
         points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
@@ -752,7 +790,9 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     }
     points3DFile.close();
 
-    std::string script = "python convert_script.py"; // TODO: modify with args for file name specification if needed
+    std::cout << "[INFO] Invoking Python script" << std::endl;
+
+    std::string script = "python ../../../src/convert_script.py"; // TODO: modify with args for file name specification if needed
     int result = std::system(script.c_str());
 
     if (result != 0) {

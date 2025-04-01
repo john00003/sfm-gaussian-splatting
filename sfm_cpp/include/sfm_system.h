@@ -14,6 +14,8 @@ struct View {
     cv::Mat K;
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
+    std::map<int, std::vector<std::vector<cv::DMatch>>> matches_map;
+    std::vector<std::pair<int, int>> points_3d;
     Eigen::Matrix4d pose = Eigen::Matrix4d::Identity();
 };
 
@@ -48,5 +50,5 @@ private:
     SfMMap& map_;
     cv::Ptr<cv::SIFT> sift_;
     cv::BFMatcher matcher_;
-    std::vector<cv::DMatch> MatchAndFilterKNN(const cv::Mat& desc1, const cv::Mat& desc2) const;
+    std::vector<cv::DMatch> MatchAndFilterKNN(const cv::Mat& desc1, const cv::Mat& desc2, View v1, View v2) const;
 };
