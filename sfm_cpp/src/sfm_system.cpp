@@ -65,11 +65,13 @@ void SfMMap::AddView(int id, const std::string& path) {
 
 void SfMMap::AddObservation(int view_id, int kp_idx, int track_id) {
     for (const auto& observation : tracks[track_id].observations) {
-        if (observation.first == kp_idx || observation.second == kp_idx) {
-            std::cout << "[ERROR] Duplicate being added!" << std::endl;
-        }
+        if (observation.second == kp_idx) {
+            std::cerr << "[ERROR] Duplicate being added!" << std::endl;
+            return;
+        } 
     }
     tracks[track_id].observations.emplace_back(view_id, kp_idx);
+    
     
 }
 
@@ -768,12 +770,12 @@ void IncrementalSfM::WriteToBinary() {
     points3DFile.close();
 }
 
-void IncrementalSfM::GetPointColor(const Track& track, int *R_p, int *G_p, int*B_p) {
+void IncrementalSfM::GetPointColor(const Track& track, std::vector<cv::Mat> images, int *R_p, int *G_p, int*B_p) {
     std::vector<cv::Vec3b> colors; // we track the average color across all images
     for (const std::pair<int, int>& observation : track.observations) {
         View view = map_.views[observation.first];
         cv::KeyPoint kp = view.keypoints[observation.second];
-        cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
+        cv::Vec3b& bgr = images[view.id].at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
         colors.push_back(bgr);
     }
     int R = 0, G = 0, B = 0, n = 0;
@@ -811,14 +813,20 @@ void IncrementalSfM::Write3DPoints() {
     std::string str;    // str acts as buffer for large group of 3D points for less accesses to file
     str.reserve(1048576); // reserve 1MB 
 
+    // load the images into the heap once to reduce I/O
+    //std::vector<cv::Mat> images;
+    //for (int i = 0; i < map_.views.size(); ++i) {
+    //    images.push_back(map_.views[i].image);
+    //}
+
     std::cout << "[INFO] Size of tracks " << map_.tracks.size() << std::endl;
     
     for (const Track& track : map_.tracks) {
         // TODO: get error
         
         // TODO: check if observation keys are correct that we use for maps
-        int R = 0, G = 0, B = 0;
-        //GetPointColor(track, &R, &G, &B);
+        int R = 255, G = 0, B = 0;
+        //GetPointColor(track, images, &R, &G, &B);
 
         int error = 0;
 
@@ -866,9 +874,9 @@ void IncrementalSfM::Write3DPoints() {
             current_iter = 0;
             str.clear();
         }
-        if (++id % 1000 == 0) {
-            std::cout << "[INFO] Finished writing " << id << std::endl;
-        }
+        //if (++id % 1000 == 0) {
+        //    std::cout << "[INFO] Finished writing " << id << std::endl;
+        //}
     }
     points3DFile << str;
     points3DFile.close();

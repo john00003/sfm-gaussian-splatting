@@ -247,11 +247,16 @@ def read_points3D_binary(path_to_model_file):
             track_length = read_next_bytes(
                 fid, num_bytes=8, format_char_sequence="Q"
             )[0]
-            track_elems = read_next_bytes(
-                fid,
-                num_bytes=8 * track_length,
-                format_char_sequence="ii" * track_length,
-            )
+            try:
+                track_elems = read_next_bytes(
+                    fid,
+                    num_bytes=8 * track_length,
+                    format_char_sequence="ii" * track_length,
+                )
+            except:
+                print(_)
+                print(track_length)
+                raise Exception("badness")
             image_ids = np.array(tuple(map(int, track_elems[0::2])))
             point2D_idxs = np.array(tuple(map(int, track_elems[1::2])))
             points3D[point3D_id] = Point3D(
@@ -404,6 +409,7 @@ if __name__ == "__main__":
     #FileNotFoundError: [Errno 2] No such file or directory: '../out/build/x64-Release/cameras.txt'
     #Error while converting camera, images, and 3D point files, and converting them to binary.
     path = "" 
+    #path ="../out/build/x64-Release/"
     binary_path = "sparse/0/" # TODO: make sure we don't need to escape the backslash
 
     #images = read_images_binary("C:\\Users\\doggo\\Downloads\\COLMAP_testing\\south-building\\sparse\\0\\images.bin")
@@ -418,6 +424,6 @@ if __name__ == "__main__":
     images = read_images_text(path + "images.txt")
     write_images_binary(images, os.path.join(binary_path, "images.bin"))
 
-    #points3D = read_points3D_text(path + "points3D.txt")
-    #write_points3D_binary(points3D, os.path.join(binary_path, "points3D.bin"))
-    read_points3D_binary("points3D.bin")
+    points3D = read_points3D_text(path + "points3D.txt")
+    write_points3D_binary(points3D, os.path.join(binary_path, "points3D.bin"))
+    #read_points3D_binary("points3D.bin")
