@@ -28,7 +28,7 @@ struct SfMMap {
     std::map<int, View> views;
     std::vector<Track> tracks;
 
-    void AddView(int id, const std::string& path);
+    void AddView(int id, const std::string& path, const std::string& path_to_write);
     void AddObservation(int view_id, int kp_idx, int track_id);
 };
 
@@ -45,6 +45,9 @@ public:
     void BundleAdjust();
     void LocalBundleAdjust(int current_view_id);
     void GenerateCOLMAPOutput();
+    void WriteToBinary();
+    void Write3DPoints();
+    void GetPointColor(const Track& track, std::vector<cv::Mat> images, int* R_p, int* G_p, int* B_p);
 
 private:
     SfMMap& map_;

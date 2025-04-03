@@ -12,3 +12,6 @@
 64	3921	7650517648390335	CMakeFiles/sfm_ceres.dir/src/main.cpp.obj	e3788184ce7bd7bc
 85	4237	7650517648600391	CMakeFiles/sfm_ceres.dir/src/sfm_system.cpp.obj	4b4685e55f60830b
 4239	5992	7650517690129728	sfm_ceres.exe	6d4d78e7736caa98
+41	4026	7653864862206120	CMakeFiles/sfm_ceres.dir/src/main.cpp.obj	e3788184ce7bd7bc
+50	4328	7653864862296139	CMakeFiles/sfm_ceres.dir/src/sfm_system.cpp.obj	4b4685e55f60830b
+4329	6312	7653864905083522	sfm_ceres.exe	6d4d78e7736caa98
