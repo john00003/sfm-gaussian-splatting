@@ -227,6 +227,43 @@ def write_cameras_binary(cameras, path_to_model_file):
                 write_next_bytes(fid, float(p), "d")
     return cameras
 
+def read_points3D_binary(path_to_model_file):
+    """
+    see: src/colmap/scene/reconstruction.cc
+        void Reconstruction::ReadPoints3DBinary(const std::string& path)
+        void Reconstruction::WritePoints3DBinary(const std::string& path)
+    """
+    points3D = {}
+    with open(path_to_model_file, "rb") as fid:
+        num_points = read_next_bytes(fid, 8, "Q")[0]
+        for _ in range(num_points):
+            binary_point_line_properties = read_next_bytes(
+                fid, num_bytes=43, format_char_sequence="QdddBBBd"
+            )
+            point3D_id = binary_point_line_properties[0]
+            xyz = np.array(binary_point_line_properties[1:4])
+            rgb = np.array(binary_point_line_properties[4:7])
+            error = np.array(binary_point_line_properties[7])
+            track_length = read_next_bytes(
+                fid, num_bytes=8, format_char_sequence="Q"
+            )[0]
+            track_elems = read_next_bytes(
+                fid,
+                num_bytes=8 * track_length,
+                format_char_sequence="ii" * track_length,
+            )
+            image_ids = np.array(tuple(map(int, track_elems[0::2])))
+            point2D_idxs = np.array(tuple(map(int, track_elems[1::2])))
+            points3D[point3D_id] = Point3D(
+                id=point3D_id,
+                xyz=xyz,
+                rgb=rgb,
+                error=error,
+                image_ids=image_ids,
+                point2D_idxs=point2D_idxs,
+            )
+    return points3D
+
 
 def write_images_binary(images, path_to_model_file):
     """
@@ -358,7 +395,15 @@ def write_images_text(images, path):
 
 
 if __name__ == "__main__":
-    path = "../out/build/x64-Release/"
+    # TODO: get this working with generated files
+    # Traceback (most recent call last):
+    #File "C:\github-repos\sfm-gaussian-splatting\sfm_cpp\src\convert_script.py", line 370, in <module>
+    #  cameras = read_cameras_text(path + "cameras.txt")
+    #File "C:\github-repos\sfm-gaussian-splatting\sfm_cpp\src\convert_script.py", line 85, in read_cameras_text
+     #  with open(path, "r") as fid:
+    #FileNotFoundError: [Errno 2] No such file or directory: '../out/build/x64-Release/cameras.txt'
+    #Error while converting camera, images, and 3D point files, and converting them to binary.
+    path = "" 
     binary_path = "sparse/0/" # TODO: make sure we don't need to escape the backslash
 
     #images = read_images_binary("C:\\Users\\doggo\\Downloads\\COLMAP_testing\\south-building\\sparse\\0\\images.bin")
@@ -373,5 +418,6 @@ if __name__ == "__main__":
     images = read_images_text(path + "images.txt")
     write_images_binary(images, os.path.join(binary_path, "images.bin"))
 
-    points3D = read_points3D_text(path + "points3D.txt")
-    write_points3D_binary(points3D, os.path.join(binary_path, "points3D.bin"))
+    #points3D = read_points3D_text(path + "points3D.txt")
+    #write_points3D_binary(points3D, os.path.join(binary_path, "points3D.bin"))
+    read_points3D_binary("points3D.bin")

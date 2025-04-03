@@ -64,7 +64,13 @@ void SfMMap::AddView(int id, const std::string& path) {
 }
 
 void SfMMap::AddObservation(int view_id, int kp_idx, int track_id) {
+    for (const auto& observation : tracks[track_id].observations) {
+        if (observation.first == kp_idx || observation.second == kp_idx) {
+            std::cout << "[ERROR] Duplicate being added!" << std::endl;
+        }
+    }
     tracks[track_id].observations.emplace_back(view_id, kp_idx);
+    
 }
 
 struct ReprojError {
@@ -479,7 +485,7 @@ void IncrementalSfM::TriangulateNewPoints(int view_id) {
 
             std::vector<cv::Point2f> vpt1 = {pt1}, vpt2 = {pt2};
             cv::Mat pt4D;
-            std::cout << "[INFO] Invoking CV triangulation" << std::endl;
+            //std::cout << "[INFO] Invoking CV triangulation" << std::endl;
             cv::triangulatePoints(P1, P2, vpt1, vpt2, pt4D);
 
             cv::Mat x = pt4D.col(0);
@@ -710,6 +716,165 @@ void IncrementalSfM::LocalBundleAdjust(int current_view_id) {
     }
 }
 
+void IncrementalSfM::WriteToBinary() {
+    std::ofstream points3DFile("points3D.bin", std::ios::binary);
+    int id = 0;
+    // initialize counter to assign 3D point IDs
+        // TODO: see if 3D points already have IDs
+
+    for (const Track& track : map_.tracks) {
+        // TODO: get RGB value or initialize to some random color
+        // TODO: get error
+        std::vector<cv::Vec3b> colors; // we track the average color across all images
+        // TODO: check if observation keys are correct that we use for maps
+        for (const std::pair<int, int>& observation : track.observations) {
+            View view = map_.views[observation.first];
+            cv::KeyPoint kp = view.keypoints[observation.second];
+            cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
+            colors.push_back(bgr);
+        }
+        int R = 0, G = 0, B = 0, n = 0;
+        for (auto it = colors.begin(); it != colors.end(); ++it) {
+            ++n;
+            B += (*it)[0];
+            G += (*it)[1];
+            R += (*it)[2];
+        }
+
+        B /= n;
+        G /= n;
+        R /= n;
+
+        //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
+
+        int error = 0;
+        points3DFile.write(reinterpret_cast<const char*>(&id), sizeof(id));
+        points3DFile.write(reinterpret_cast<const char*>(&track.point[0]), sizeof(track.point[0]));
+        points3DFile.write(reinterpret_cast<const char*>(&track.point[1]), sizeof(track.point[1]));
+        points3DFile.write(reinterpret_cast<const char*>(&track.point[2]), sizeof(track.point[2]));
+        points3DFile.write(reinterpret_cast<const char*>(&R), sizeof(R));
+        points3DFile.write(reinterpret_cast<const char*>(&G), sizeof(G));
+        points3DFile.write(reinterpret_cast<const char*>(&B), sizeof(B));
+        points3DFile.write(reinterpret_cast<const char*>(&error), sizeof(error));
+        size_t numObservations = track.observations.size();
+        std::cout << "[INFO] Observations of size " << numObservations << std::endl;
+        for (const std::pair<int, int>& observation : track.observations) {
+            points3DFile.write(reinterpret_cast<const char*>(&observation.first), sizeof(observation.first));
+            points3DFile.write(reinterpret_cast<const char*>(&observation.second), sizeof(observation.second));
+        }
+        points3DFile.write("\n", 1);
+        ++id;
+    }
+    points3DFile.close();
+}
+
+void IncrementalSfM::GetPointColor(const Track& track, int *R_p, int *G_p, int*B_p) {
+    std::vector<cv::Vec3b> colors; // we track the average color across all images
+    for (const std::pair<int, int>& observation : track.observations) {
+        View view = map_.views[observation.first];
+        cv::KeyPoint kp = view.keypoints[observation.second];
+        cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
+        colors.push_back(bgr);
+    }
+    int R = 0, G = 0, B = 0, n = 0;
+    for (auto it = colors.begin(); it != colors.end(); ++it) {
+        ++n;
+        B += (*it)[0];
+        G += (*it)[1];
+        R += (*it)[2];
+    }
+
+    B /= n;
+    G /= n;
+    R /= n;
+
+    *B_p = B;
+    *G_p = G;
+    *R_p = R;
+
+    
+}
+
+void IncrementalSfM::Write3DPoints() {
+
+    std::cout << "[INFO] Writing points3D.txt" << std::endl;
+    std::ofstream points3DFile("points3D.txt", std::ios::out | std::ios::ate);
+    std::vector<char> fileBuffer(1048576);  // 1 MB buffer allocated on the heap
+    points3DFile.rdbuf()->pubsetbuf(fileBuffer.data(), fileBuffer.size());
+    int id = 0;
+    // initialize counter to assign 3D point IDs
+        // TODO: see if 3D points already have IDs
+    int iter = 1048576 / (48 + 10 * static_cast<int>(map_.views.size())) - 20; //subtract 20 to add some room for error
+    int current_iter = 0;
+    std::ostringstream oss; // Efficiently format the string
+    oss.precision(6); // Set floating-point precision
+    std::string str;    // str acts as buffer for large group of 3D points for less accesses to file
+    str.reserve(1048576); // reserve 1MB 
+
+    std::cout << "[INFO] Size of tracks " << map_.tracks.size() << std::endl;
+    
+    for (const Track& track : map_.tracks) {
+        // TODO: get error
+        
+        // TODO: check if observation keys are correct that we use for maps
+        int R = 0, G = 0, B = 0;
+        //GetPointColor(track, &R, &G, &B);
+
+        int error = 0;
+
+        // TODO: get upper bound on number of bytes written per iteration, and then write to the file every n iterations
+        //assume 6 digit 3dpoint id : 6 bytes
+        // space:                   : 1 byte
+        // 8 digits for each float  : 3*(8bytes)
+        // space:                   : 3 byte
+        // 3 digits for each rgb    : 3*(3bytes)
+        // space:                   : 3 byte
+        // 1 digit for camera       : 1 byte
+        // space:                   : 1 byte
+        // then calculate number of matches
+        //                          : (3 + 6 + 1)*n bytes (last space will be \n instead of space so formula works)
+        //                          = 48 + (10)*n bytes per string  where n is upper bounded by number of images                
+        //if (current_iter > iter) {
+        //    // write string to file
+        //    points3DFile << str;
+        //    current_iter = 0;
+        //    str.clear();
+        //}
+
+        oss.str(""); // Reset content
+        oss << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2]
+            << " " << R << " " << G << " " << B << " " << error;
+
+        for (const auto& observation : track.observations) {
+            oss << " " << observation.first << " " << observation.second;
+        }
+        oss << "\n";
+
+        str.append(oss.str());
+
+        //snprintf(buffer, 1024, "%d %f %f %f %d %d %d %d", id, track.point[0], track.point[1], track.point[2], R, G, B, error);
+        //str.append(buffer);
+
+        //for (const std::pair<int, int>& observation : track.observations) {
+        //    snprintf(buffer, 1024, " %d %d", observation.first, observation.second);
+        //    str.append(buffer);
+        //}
+        //str.append("\n");
+
+        if (++current_iter > iter) {
+            points3DFile << str; // Flush buffer
+            current_iter = 0;
+            str.clear();
+        }
+        if (++id % 1000 == 0) {
+            std::cout << "[INFO] Finished writing " << id << std::endl;
+        }
+    }
+    points3DFile << str;
+    points3DFile.close();
+    
+}
+
 void IncrementalSfM::GenerateCOLMAPOutput(){
     // Assumptions:
     //    - all photos were taken from the same camera
@@ -747,48 +912,49 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     }
     imageFile.close();
 
-    std::cout << "[INFO] Writing points3D.txt" << std::endl;
-    // open points3D.txt
-    std::ofstream points3DFile;
-    points3DFile.open("points3D.txt");
-    int id = 0;
-    // initialize counter to assign 3D point IDs
-        // TODO: see if 3D points already have IDs
-    
-    for (const Track& track : map_.tracks) {
-        // TODO: get RGB value or initialize to some random color
-        // TODO: get error
-        std::vector<cv::Vec3b> colors; // we track the average color across all images
-        // TODO: check if observation keys are correct that we use for maps
-        for (const std::pair<int, int>& observation : track.observations) {
-            View view = map_.views[observation.first];
-            cv::KeyPoint kp = view.keypoints[observation.second];
-            cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
-            colors.push_back(bgr);
-        }
-        int R = 0, G = 0, B = 0, n = 0;
-        for (auto it = colors.begin(); it != colors.end(); ++it) {
-            ++n;
-            B += (*it)[0];
-            G += (*it)[1];
-            R += (*it)[2];
-        }
+    //std::cout << "[INFO] Writing points3D.bin" << std::endl;
+    //WriteToBinary();
+    Write3DPoints();
+    //std::cout << "[INFO] Writing points3D.txt" << std::endl;
+    //std::ofstream points3DFile;
+    //points3DFile.open("points3D.txt");
+    //int id = 0;
+    //// initialize counter to assign 3D point IDs
+    //    // TODO: see if 3D points already have IDs
+    //
+    //for (const Track& track : map_.tracks) {
+    //    // TODO: get error
+    //    std::vector<cv::Vec3b> colors; // we track the average color across all images
+    //    // TODO: check if observation keys are correct that we use for maps
+    //    for (const std::pair<int, int>& observation : track.observations) {
+    //        View view = map_.views[observation.first];
+    //        cv::KeyPoint kp = view.keypoints[observation.second];
+    //        cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
+    //        colors.push_back(bgr);
+    //    }
+    //    int R = 0, G = 0, B = 0, n = 0;
+    //    for (auto it = colors.begin(); it != colors.end(); ++it) {
+    //        ++n;
+    //        B += (*it)[0];
+    //        G += (*it)[1];
+    //        R += (*it)[2];
+    //    }
 
-        B /= n;
-        G /= n;
-        R /= n;
+    //    B /= n;
+    //    G /= n;
+    //    R /= n;
 
-        //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
-        
-        int error = 0;
-        points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
-        for (const std::pair<int, int>& observation : track.observations) {
-            points3DFile << " " << observation.first << " " << observation.second;  // TODO: ensure this is same order as COLMAP
-        }
-        points3DFile << "\n";
-        ++id;
-    }
-    points3DFile.close();
+    //    //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
+    //    
+    //    int error = 0;
+    //    points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
+    //    for (const std::pair<int, int>& observation : track.observations) {
+    //        points3DFile << " " << observation.first << " " << observation.second;  // TODO: ensure this is same order as COLMAP
+    //    }
+    //    points3DFile << "\n";
+    //    ++id;
+    //}
+    //points3DFile.close();
 
     std::cout << "[INFO] Invoking Python script" << std::endl;
 
