@@ -141,7 +141,7 @@ void runSfMOnly(char *folder) {
     int id = 0;
     for (const auto& entry : fs::directory_iterator(folder)) {
         if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
-            map.AddView(id, entry.path().string());
+            map.AddView(id, entry.path().string(), entry.path().filename().string());
             auto& view = map.views[id];
             if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;
@@ -279,7 +279,7 @@ int main(int argc, char** argv)
                     int id = 0;
                     for (const auto& entry : fs::directory_iterator(folder)) {
                         if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
-                            map.AddView(id, entry.path().string());
+                            map.AddView(id, entry.path().string(), entry.path().filename().string());
                             auto& view = map.views[id];
                             if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
                                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;

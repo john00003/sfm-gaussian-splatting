@@ -1,5 +1,6 @@
 #pragma once
 #include <opencv2/opencv.hpp>
+#include <opencv2/cudafeatures2d.hpp>
 #include <Eigen/Dense>
 #include <map>
 #include <vector>
@@ -52,6 +53,6 @@ public:
 private:
     SfMMap& map_;
     cv::Ptr<cv::SIFT> sift_;
-    cv::BFMatcher matcher_;
+    cv::Ptr<cv::cuda::DescriptorMatcher> matcher_;
     std::vector<cv::DMatch> MatchAndFilterKNN(const cv::Mat& desc1, const cv::Mat& desc2, View v1, View v2) const;
 };

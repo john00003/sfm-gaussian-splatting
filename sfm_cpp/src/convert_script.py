@@ -408,9 +408,9 @@ if __name__ == "__main__":
      #  with open(path, "r") as fid:
     #FileNotFoundError: [Errno 2] No such file or directory: '../out/build/x64-Release/cameras.txt'
     #Error while converting camera, images, and 3D point files, and converting them to binary.
-    path = "" 
+    path = "../../" 
     #path ="../out/build/x64-Release/"
-    binary_path = "sparse/0/" # TODO: make sure we don't need to escape the backslash
+    binary_path = "../../sparse/0/" # TODO: make sure we don't need to escape the backslash
 
     #images = read_images_binary("C:\\Users\\doggo\\Downloads\\COLMAP_testing\\south-building\\sparse\\0\\images.bin")
     #write_images_text(images, "images.txt")

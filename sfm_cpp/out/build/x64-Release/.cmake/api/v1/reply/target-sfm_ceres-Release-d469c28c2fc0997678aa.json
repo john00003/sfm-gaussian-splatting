@@ -23,6 +23,7 @@
 			"find_package",
 			"find_dependency",
 			"add_definitions",
+			"add_compile_definitions",
 			"include_directories"
 		],
 		"files" : 
@@ -34,8 +35,11 @@
 			"C:/github-repos/vcpkg/installed/x64-windows/share/glog/glog-targets.cmake",
 			"C:/github-repos/vcpkg/installed/x64-windows/share/glog/glog-config.cmake",
 			"C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+			"C:/github-repos/vcpkg/installed/x64-windows/share/opencv4/OpenCVModules.cmake",
+			"C:/github-repos/vcpkg/installed/x64-windows/share/opencv4/OpenCVConfig.cmake",
 			"C:/github-repos/vcpkg/installed/x64-windows/share/pangolin/PangolinTargets.cmake",
-			"C:/github-repos/vcpkg/installed/x64-windows/share/pangolin/PangolinConfig.cmake"
+			"C:/github-repos/vcpkg/installed/x64-windows/share/pangolin/PangolinConfig.cmake",
+			"C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/vcpkg-cmake-wrapper.cmake"
 		],
 		"nodes" : 
 		[
@@ -45,7 +49,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 52,
+				"line" : 53,
 				"parent" : 0
 			},
 			{
@@ -57,7 +61,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 59,
+				"line" : 60,
 				"parent" : 0
 			},
 			{
@@ -69,7 +73,7 @@
 			{
 				"command" : 7,
 				"file" : 1,
-				"line" : 35,
+				"line" : 36,
 				"parent" : 0
 			},
 			{
@@ -139,7 +143,7 @@
 			{
 				"command" : 7,
 				"file" : 1,
-				"line" : 38,
+				"line" : 37,
 				"parent" : 0
 			},
 			{
@@ -155,7 +159,7 @@
 			{
 				"command" : 5,
 				"file" : 8,
-				"line" : 6,
+				"line" : 157,
 				"parent" : 20
 			},
 			{
@@ -165,26 +169,58 @@
 			{
 				"command" : 4,
 				"file" : 7,
+				"line" : 248,
+				"parent" : 22
+			},
+			{
+				"command" : 7,
+				"file" : 1,
+				"line" : 39,
+				"parent" : 0
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 893,
+				"parent" : 24
+			},
+			{
+				"file" : 10,
+				"parent" : 25
+			},
+			{
+				"command" : 5,
+				"file" : 10,
+				"line" : 6,
+				"parent" : 26
+			},
+			{
+				"file" : 9,
+				"parent" : 27
+			},
+			{
+				"command" : 4,
+				"file" : 9,
 				"line" : 105,
-				"parent" : 22
+				"parent" : 28
 			},
 			{
 				"command" : 4,
-				"file" : 7,
+				"file" : 9,
 				"line" : 96,
-				"parent" : 22
+				"parent" : 28
 			},
 			{
 				"command" : 4,
-				"file" : 7,
+				"file" : 9,
 				"line" : 61,
-				"parent" : 22
+				"parent" : 28
 			},
 			{
 				"command" : 4,
-				"file" : 7,
+				"file" : 9,
 				"line" : 161,
-				"parent" : 22
+				"parent" : 28
 			},
 			{
 				"command" : 9,
@@ -193,15 +229,43 @@
 				"parent" : 0
 			},
 			{
+				"command" : 8,
+				"file" : 7,
+				"line" : 38,
+				"parent" : 22
+			},
+			{
+				"command" : 7,
+				"file" : 6,
+				"line" : 76,
+				"parent" : 34
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 847,
+				"parent" : 35
+			},
+			{
+				"file" : 11,
+				"parent" : 36
+			},
+			{
 				"command" : 10,
+				"file" : 11,
+				"line" : 11,
+				"parent" : 37
+			},
+			{
+				"command" : 11,
 				"file" : 1,
 				"line" : 7,
 				"parent" : 0
 			},
 			{
-				"command" : 10,
+				"command" : 11,
 				"file" : 1,
-				"line" : 43,
+				"line" : 44,
 				"parent" : 0
 			}
 		]
@@ -242,8 +306,12 @@
 					"define" : "GLOG_USE_GLOG_EXPORT"
 				},
 				{
-					"backtrace" : 27,
+					"backtrace" : 33,
 					"define" : "GL_SILENCE_DEPRECATION"
+				},
+				{
+					"backtrace" : 38,
+					"define" : "H5_BUILT_AS_DYNAMIC_LIB"
 				},
 				{
 					"backtrace" : 3,
@@ -269,11 +337,11 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 28,
+					"backtrace" : 39,
 					"path" : "/usr/local/opt/exiv2/include"
 				},
 				{
-					"backtrace" : 29,
+					"backtrace" : 40,
 					"path" : "C:/github-repos/sfm-gaussian-splatting/sfm_cpp/include"
 				},
 				{
@@ -285,12 +353,12 @@
 					"path" : "C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Release/_deps/imgui-src/backends"
 				},
 				{
-					"backtrace" : 29,
+					"backtrace" : 40,
 					"isSystem" : true,
 					"path" : "C:/github-repos/vcpkg/installed/x64-windows/include/opencv4"
 				},
 				{
-					"backtrace" : 29,
+					"backtrace" : 40,
 					"isSystem" : true,
 					"path" : "C:/github-repos/vcpkg/installed/x64-windows/include"
 				},
@@ -298,6 +366,11 @@
 					"backtrace" : 3,
 					"isSystem" : true,
 					"path" : "C:/github-repos/vcpkg/installed/x64-windows/include/eigen3"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/include"
 				}
 			],
 			"language" : "CXX",
@@ -358,37 +431,172 @@
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_highgui4.lib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_ml4.lib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_objdetect4.lib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_photo4.lib",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 3,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_stitching4.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_video4.lib",
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_aruco4.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_videoio4.lib",
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_bgsegm4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_bioinspired4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_ccalib4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudabgsegm4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudafeatures2d4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudaobjdetect4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudastereo4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_dnn_objdetect4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_dnn_superres4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_dpm4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_face4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_fuzzy4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_hdf4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_hfs4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_img_hash4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_intensity_transform4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_line_descriptor4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_mcc4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_rapid4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_reg4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_saliency4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_signal4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_stereo4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_structured_light4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_superres4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_surface_matching4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_tracking4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_videostab4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_wechat_qrcode4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_xfeatures2d4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_xobjdetect4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_xphoto4.lib",
 				"role" : "libraries"
 			},
 			{
@@ -503,7 +711,87 @@
 			},
 			{
 				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_shape4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_highgui4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_datasets4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_plot4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_text4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_ml4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_phase_unwrapping4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudacodec4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_videoio4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudaoptflow4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudalegacy4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudawarping4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_optflow4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_ximgproc4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_video4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_imgcodecs4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_objdetect4.lib",
 				"role" : "libraries"
 			},
 			{
@@ -528,12 +816,102 @@
 			},
 			{
 				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_photo4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudaimgproc4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudafilters4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_imgproc4.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudaarithm4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_core4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\opencv_cudev4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\cudart_static.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppial.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppitc.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppig.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppist.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppidei.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\cublas.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\cublasLt.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\cufft.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppicc.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppif.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppim.lib\"",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 23,
+				"fragment" : "\"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.4\\lib\\x64\\nppc.lib\"",
 				"role" : "libraries"
 			},
 			{
@@ -567,7 +945,7 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 23,
+				"backtrace" : 29,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\glew32.lib",
 				"role" : "libraries"
 			},
@@ -577,17 +955,17 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 24,
+				"backtrace" : 30,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\libpng16.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 24,
+				"backtrace" : 30,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\zlib.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 24,
+				"backtrace" : 30,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\jpeg.lib",
 				"role" : "libraries"
 			},
@@ -602,42 +980,42 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 25,
+				"backtrace" : 31,
 				"fragment" : "shlwapi.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 26,
+				"backtrace" : 32,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\avcodec.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 26,
+				"backtrace" : 32,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\avformat.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 26,
+				"backtrace" : 32,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\avutil.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 26,
+				"backtrace" : 32,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\swscale.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 26,
+				"backtrace" : 32,
 				"fragment" : "C:\\github-repos\\vcpkg\\installed\\x64-windows\\lib\\avdevice.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 23,
+				"backtrace" : 29,
 				"fragment" : "opengl32.lib",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 23,
+				"backtrace" : 29,
 				"fragment" : "glu32.lib",
 				"role" : "libraries"
 			},

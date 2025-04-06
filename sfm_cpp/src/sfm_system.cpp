@@ -6,6 +6,7 @@
 
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/cudafeatures2d.hpp>
 #include <set>
 #include <iostream>
 #include <algorithm>
@@ -52,10 +53,10 @@ bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height,
     }
 }
 
-void SfMMap::AddView(int id, const std::string& path) {
+void SfMMap::AddView(int id, const std::string& path, const std::string& path_to_write) {
     View view;
     view.id = id;
-    view.image_path = path;
+    view.image_path = path_to_write;
     view.image = cv::imread(path);
     if(view.image.empty()) {
         std::cerr << "[ERROR] Failed to load image: " << path << std::endl;
@@ -120,7 +121,7 @@ IncrementalSfM::IncrementalSfM(SfMMap& map)
     : map_(map)
 {
     sift_ = cv::SIFT::create();
-    matcher_ = cv::BFMatcher(cv::NORM_L2);
+    matcher_ = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_L2);
 }
 
 bool IsGoodTriangulatedPoint(const cv::Point2f& pt1, const cv::Point2f& pt2,
@@ -189,7 +190,9 @@ void IncrementalSfM::Initialize() {
             std::cout << "[INFO] Matching key points in view " << v1.id << " to view " << v2.id << std::endl;
 
             std::vector<std::vector<cv::DMatch>> knn;
-            matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
+            cv::cuda::GpuMat v1_descriptors_gpu(v1.descriptors);
+            cv::cuda::GpuMat v2_descriptors_gpu(v2.descriptors);
+            matcher_->knnMatch(v1_descriptors_gpu, v2_descriptors_gpu, knn, 2);
             // TODO: will matches work for both images like this? will order be correct?
             v1.matches_map[v2.id] = knn;
             // we reverse the matches to give to view 2
@@ -800,7 +803,7 @@ void IncrementalSfM::GetPointColor(const Track& track, std::vector<cv::Mat> imag
 void IncrementalSfM::Write3DPoints() {
 
     std::cout << "[INFO] Writing points3D.txt" << std::endl;
-    std::ofstream points3DFile("points3D.txt", std::ios::out | std::ios::ate);
+    std::ofstream points3DFile("..\\..\\points3D.txt", std::ios::out | std::ios::ate);
     std::vector<char> fileBuffer(1048576);  // 1 MB buffer allocated on the heap
     points3DFile.rdbuf()->pubsetbuf(fileBuffer.data(), fileBuffer.size());
     int id = 0;
@@ -895,7 +898,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     std::cout << "[INFO] Writing cameras.txt" << std::endl;
     std::ofstream cameraFile;
     // open cameras.txt
-    cameraFile.open("cameras.txt");
+    cameraFile.open("..\\..\\cameras.txt");
     // TODO: check if we should use pinhole or opencv cam. gaussian splat wants pinhole, but do we need to do further conversion?
     // TODO: is GetIntrinsicsFromExif used anywhere?
     View representative_cam = map_.views.begin()->second;
@@ -905,7 +908,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     
     std::cout << "[INFO] Writing images.txt" << std::endl;
     std::ofstream imageFile;
-    imageFile.open("images.txt");
+    imageFile.open("..\\..\\images.txt");
     // open images.txt
     // iterate through map_.views
     // for (auto it = num_map.begin(); it != num_map.end(); ++it)

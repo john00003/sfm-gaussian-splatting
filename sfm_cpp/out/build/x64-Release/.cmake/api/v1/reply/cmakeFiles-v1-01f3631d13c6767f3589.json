@@ -344,6 +344,21 @@
 			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
 		},
 		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindCUDAToolkit.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
 			"isExternal" : true,
 			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/opencv4/OpenCVModules.cmake"
 		},
@@ -504,6 +519,285 @@
 		},
 		{
 			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindHDF5.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/SelectLibraryConfigurations.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/hdf5-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/hdf5-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/zlib/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindZLIB.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/SelectLibraryConfigurations.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/hdf5-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/hdf5-targets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/hdf5/hdf5-targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/tesseract/TesseractConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/tesseract/TesseractConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/CURLConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/CURLConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/zlib/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindZLIB.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/CURLTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/CURLTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/curl/CURLTargets-release.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/SelectLibraryConfigurations.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/leptonica/LeptonicaConfig-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/leptonica/LeptonicaConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/openjpeg/OpenJPEGConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/openjpeg/OpenJPEGConfig.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/openjpeg/OpenJPEGTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/openjpeg/OpenJPEGTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/openjpeg/OpenJPEGTargets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/WebP/WebPConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/WebP/WebPConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckLibraryExists.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckCSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/WebP/WebPTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/WebP/WebPTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/WebP/WebPTargets-release.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/SelectLibraryConfigurations.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/leptonica/LeptonicaTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/leptonica/LeptonicaTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/leptonica/LeptonicaTargets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/libarchive/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindLibArchive.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/tesseract/TesseractTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/tesseract/TesseractTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/tesseract/TesseractTargets-release.cmake"
+		},
+		{
+			"isExternal" : true,
 			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/quirc/quirc-config.cmake"
 		},
 		{
@@ -513,10 +807,6 @@
 		{
 			"isExternal" : true,
 			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/quirc/quirc-config-release.cmake"
-		},
-		{
-			"isExternal" : true,
-			"path" : "C:/github-repos/vcpkg/installed/x64-windows/share/opencv4/OpenCVModules-debug.cmake"
 		},
 		{
 			"isExternal" : true,

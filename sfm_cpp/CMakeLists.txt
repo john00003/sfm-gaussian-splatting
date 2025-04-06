@@ -8,6 +8,7 @@ include_directories(/usr/local/opt/exiv2/include)
 link_directories(/usr/local/opt/exiv2/lib)
 
 set(CMAKE_FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/.cache)
+set(OpenCV_ROOT "${VCPKG_INSTALLED_DIR}/x64-windows/share/opencv4") 
 
 include(FetchContent)
 FetchContent_Declare(
