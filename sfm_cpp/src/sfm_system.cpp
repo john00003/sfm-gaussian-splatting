@@ -169,18 +169,147 @@ void IncrementalSfM::FilterBadPointsAfterBA(float reproj_thresh) {
     map_.tracks = std::move(filtered);
 }
 
-void IncrementalSfM::Initialize() {
-    if (map_.views.size() < 2) return;
+std::vector<std::vector<cv::DMatch>> IncrementalSfM::MatchPair(View& v1, View& v2) {
+    std::vector<std::vector<cv::DMatch>> knn;
+    cv::cuda::GpuMat v1_descriptors_gpu(v1.descriptors);
+    cv::cuda::GpuMat v2_descriptors_gpu(v2.descriptors);
+    matcher_->knnMatch(v1_descriptors_gpu, v2_descriptors_gpu, knn, 2);
+    // TODO: will matches work for both images like this? will order be correct?
+    v1.matches_map[v2.id] = knn;
+    // we reverse the matches to give to view 2
+    std::vector<std::vector<cv::DMatch>> reversed_knn;
 
-    int best_i = -1, best_j = -1;
+    for (int i = 0; i < knn.size(); ++i) {
+        std::vector<cv::DMatch> matches;
+        for (int j = 0; j < knn[i].size(); ++j) {
+
+            matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
+        }
+        reversed_knn.push_back(matches);
+    }
+
+    v2.matches_map[v1.id] = reversed_knn;
+
+    return knn;
+}
+
+size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
     size_t best_matches = 0;
 
-    for (auto& [id, view] : map_.views) {
-        if (view.keypoints.empty()) {
-            std::cout << "[INFO] Detecting key points with sift for view " << id << std::endl;
-            sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
+    for (auto it = map_.views.begin(); it != map_.views.end(); ++it) {
+        
+        auto& view = it->second;
+        View& prev = (it == map_.views.begin())
+            ? std::prev(map_.views.end())->second
+            : std::prev(it)->second;
+        View& next = std::next(it)->second;
+
+        // don't need to match to image i-1 unless this is the first iteration, the previous iteration (i-1) will have already computed matches between (i-1) and (i)
+        if (it == map_.views.begin()) {
+            std::cout << "[INFO] Matching key points in view " << view.id << " to view " << prev.id << std::endl;
+            std::cout << "[INFO] Image names: " << view.image_path << " and " << prev.image_path << std::endl;
+
+            std::vector<std::vector<cv::DMatch>> knn = MatchPair(view, prev);
+
+            size_t good = 0;
+            for (const auto& m : knn) {
+                if (m.size() < 2) continue;
+                if (m[0].distance < 0.75f * m[1].distance) ++good;
+            }
+
+            if (good > best_matches) {
+                best_matches = good;
+                *best_i = view.id;
+                *best_j = prev.id;
+                std::cout << "[INFO] New best matches found. " << best_matches << " found, best_i = " << *best_i << " best j = " << *best_j << " index of i in map_.views " << it->first << " index of j in map_.views " << std::prev(it)->first << std::endl;
+            }
         }
+        
+        // don't need to match last image to first, already done in first iteration
+        if (it != std::prev(map_.views.end())) {
+            std::cout << "[INFO] Matching key points in view " << view.id << " to view " << next.id << std::endl;
+            std::cout << "[INFO] Image names: " << view.image_path << " and " << next.image_path << std::endl;
+
+            std::vector<std::vector<cv::DMatch>> knn = MatchPair(view, next);
+
+            size_t good = 0;
+            for (const auto& m : knn) {
+                if (m.size() < 2) continue;
+                if (m[0].distance < 0.75f * m[1].distance) ++good;
+            }
+
+            if (good > best_matches) {
+                best_matches = good;
+                
+                *best_i = view.id;
+                *best_j = next.id;
+                std::cout << "[INFO] New best matches found. " << best_matches << " found, best_i = " << *best_i << " best j = " << *best_j << " index of i in map_.views " << it->first << " index of j in map_.views " << std::next(it)->first << std::endl;
+            }
+        }
+        
     }
+
+    // NOW: we make matches transitive
+    // i.e., if a kp in image 0 matches with a kp in image 1
+        // then that kp in image 1 matches with a kp in image 2
+        // we never try to match image 0 to image 1
+            // so instead, we follow matches
+
+    // after sequential matching, each View object matches_map will have two entries: prev.id = {} next.id = {}
+    // ASSUME PROCEDURE IS ONLY FOR NEXT
+    // so we can look at next 
+    // // actually, check len of each vector, see what depth the dimension of 2 is in
+    // for each match in std::vector<std::vector<cv::DMatch>>
+        // for best and second best match in std::vector<cv::DMatch>
+            // query descriptor is kp in original image: set ORIG_QUERY to query
+            // train descriptor is kp in next: set CURR_TRAIN to train
+            // look in next.matches_map[(next+1)], using CURR_TRAIN as the query descriptor, to see if CURR_TRAIN matches with anything in next image
+                // if yes, add match to ORIG_QUERY: ORIG_QUERY matches with new train
+                // and add reversed match to image with new train!
+                // update CURR_TRAIN to new train
+            // iteratively repeat, until (next+1 == n || next.matches_map[(next+1)] has no entry for CURR_TRAIN)
+
+    //for (auto view = map_.views.begin(); view != map_.views.end(); ++view) {    // iterate through each view
+    //    if (std::next(view) == map_.views.end()) {
+    //        break;
+    //    }
+    //    View next = std::next(view)->second;
+    //    for (auto match = view->second.matches_map[next.id].begin(); match != view->second.matches_map[next.id].end(); ++match) {   // iterate through all the key points of view 
+    //        for (auto best = match->begin(); best != match->end(); ++best) {    // iterate through first and second best match for a given key point
+    //            int orig_query = best->queryIdx;
+    //            int curr_train = best->trainIdx;
+    //            std::map<int, View>::iterator curr_next = std::next(std::next(view));
+
+    //            while (curr_next != map_.views.end() && !curr_next->second.matches_map[curr_train].empty()) {
+    //                std::vector<cv::DMatch> new_matches;
+    //                curr_next->second.matches_map[curr_train][]
+    //                cv::DMatch best_match(orig_query, (*match)[0].distance * 1.1)
+    //                if (std::map<int, std::vector<std::vector<cv::DMatch>>>::iterator search = view->second.matches_map.find(curr_next->second.id); search != view->second.matches_map.end()) {
+    //                    // we add this point to the entry in matches_map
+    //                    
+
+    //                    search->second.push_back()
+    //                }
+    //                else {
+    //                    // we make a new entry in matches_map
+    //                }
+    //            }
+
+
+    //        }
+    //    }
+    //}
+
+    if (*best_i == -1 || *best_j == -1) {
+        std::cerr << "[ERROR] Failed to find suitable initial image pair." << std::endl;
+        return 0;
+    }
+
+    return best_matches;
+}
+
+size_t IncrementalSfM::MatchViewsBF(int *best_i, int *best_j){
+    size_t best_matches = 0;
 
     for (auto it1 = map_.views.begin(); it1 != map_.views.end(); ++it1) {
         for (auto it2 = std::next(it1); it2 != map_.views.end(); ++it2) {
@@ -201,7 +330,7 @@ void IncrementalSfM::Initialize() {
             for (int i = 0; i < knn.size(); ++i) {
                 std::vector<cv::DMatch> matches;
                 for (int j = 0; j < knn[i].size(); ++j) {
-                    
+
                     matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
                 }
                 reversed_knn.push_back(matches);
@@ -217,25 +346,62 @@ void IncrementalSfM::Initialize() {
 
             if (good > best_matches) {
                 best_matches = good;
-                best_i = v1.id;
-                best_j = v2.id;
+                *best_i = v1.id;
+                *best_j = v2.id;
             }
         }
     }
 
-    if (best_i == -1 || best_j == -1) {
+    if (*best_i == -1 || *best_j == -1) {
         std::cerr << "[ERROR] Failed to find suitable initial image pair." << std::endl;
-        return;
+        return 0;
     }
 
-    std::cout << "[INFO] Initialize using best pair: view " << best_i << " and view " << best_j
-              << " with " << best_matches << " matches." << std::endl;
+    return best_matches;
 
+}
+
+// TODO: add sequential checkbox in GUI!
+int IncrementalSfM::Initialize(bool sequential) {
+    if (map_.views.size() < 2) return -1;
+
+    int best_i = -1, best_j = -1;
+    
+
+    for (auto& [id, view] : map_.views) {
+        if (view.keypoints.empty()) {
+            std::cout << "[INFO] Detecting key points with sift for view " << id << std::endl;
+            // TODO: see if GPU version exists
+            // also, try to attach RGB color to the view, make a parallel array of colors that goes with keypoints.
+            sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
+            std::cout << "[INFO] Attatching colors to keypoints for view " << id << std::endl;
+            for (auto& kp : view.keypoints) {
+                view.colors.push_back(view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x)));
+            }
+        }
+    }
+
+    size_t best_matches;
+    if (sequential) {
+        best_matches = MatchViewsSequential(&best_i, &best_j);
+    }
+    else {
+        best_matches = MatchViewsBF(&best_i, &best_j);
+    }
+    
+    
+
+    std::cout << "[INFO] Initialize using best pair: view " << best_i << " and view " << best_j
+        << " with " << best_matches << " matches." << std::endl;
+    
     PerformInitialPair(map_.views[best_i], map_.views[best_j]);
+
+    return best_i;
 }
 
 void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
     std::vector<std::vector<cv::DMatch>> knn = v1.matches_map[v2.id];
+    std::cout << "[INFO] Number of matches inside function:  " << knn.size() << std::endl;
     //std::vector<std::vector<cv::DMatch>> knn;
     //matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
 
@@ -247,7 +413,7 @@ void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
     }
 
     if (good.size() < 30) {
-        std::cerr << "[WARN] Too few matches for initialization." << std::endl;
+        std::cerr << "[WARN] Too few matches for initialization. Only " << good.size() << " many matches." << std::endl;
         return;
     }
 
@@ -324,6 +490,7 @@ void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
                 v2.keypoints[dm.trainIdx].pt == inliers2[i]) {
                 track.observations.push_back({v1.id, dm.queryIdx});
                 track.observations.push_back({v2.id, dm.trainIdx});
+                track.color = v1.colors[dm.queryIdx];
                 map_.tracks.push_back(track);
                 v1.points_3d.push_back(std::pair<int, int>(dm.queryIdx, i));
                 v2.points_3d.push_back(std::pair<int, int>(dm.trainIdx, i));
@@ -355,13 +522,14 @@ std::vector<cv::DMatch> IncrementalSfM::MatchAndFilterKNN(
     return good;
 }
 
+// TODO: start registering from best views found, i.e, ones used for initialization
 bool IncrementalSfM::RegisterNextView(int view_id) {
     auto& view = map_.views[view_id];
     if(view.registered) {
         return false;
     }
     // TODO: why do we do this again? we already do this in initialize
-    std::cout << "[INFO] Detecting key points with sift for view " << view_id << std::endl;
+    //std::cout << "[INFO] Detecting key points with sift for view " << view_id << std::endl;
     //sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
 
     std::vector<cv::Point3f> pts3D;
@@ -507,6 +675,7 @@ void IncrementalSfM::TriangulateNewPoints(int view_id) {
 
             Track track;
             track.point = Eigen::Vector3d(X, Y, Z);
+            track.color = view.colors[qidx];
             track.observations.push_back({view_id, qidx});
             track.observations.push_back({v2.id, tidx});
             map_.tracks.push_back(track);
@@ -828,7 +997,8 @@ void IncrementalSfM::Write3DPoints() {
         // TODO: get error
         
         // TODO: check if observation keys are correct that we use for maps
-        int R = 255, G = 0, B = 0;
+        
+        int R = track.color[2], G = track.color[1], B = track.color[0];
         //GetPointColor(track, images, &R, &G, &B);
 
         int error = 0;

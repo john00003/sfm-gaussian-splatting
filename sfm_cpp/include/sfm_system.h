@@ -14,6 +14,7 @@ struct View {
     cv::Mat image;
     cv::Mat K;
     std::vector<cv::KeyPoint> keypoints;
+    std::vector<cv::Vec3b> colors; // a parallel array with keypoints
     cv::Mat descriptors;
     std::map<int, std::vector<std::vector<cv::DMatch>>> matches_map;
     std::vector<std::pair<int, int>> points_3d;
@@ -22,6 +23,7 @@ struct View {
 
 struct Track {
     Eigen::Vector3d point;
+    cv::Vec3b color;
     std::vector<std::pair<int, int>> observations;
 };
 
@@ -39,7 +41,7 @@ class IncrementalSfM {
 public:
     explicit IncrementalSfM(SfMMap& map);
     void FilterBadPointsAfterBA(float reproj_thresh);
-    void Initialize();
+    int Initialize(bool sequential);
     void PerformInitialPair(View& v1, View& v2);
     bool RegisterNextView(int view_id);
     void TriangulateNewPoints(int view_id);
@@ -49,6 +51,9 @@ public:
     void WriteToBinary();
     void Write3DPoints();
     void GetPointColor(const Track& track, std::vector<cv::Mat> images, int* R_p, int* G_p, int* B_p);
+    std::vector<std::vector<cv::DMatch>> MatchPair(View& v1, View& v2);
+    size_t MatchViewsBF(int* best_i, int* best_j);
+    size_t MatchViewsSequential(int* best_i, int* best_j);
 
 private:
     SfMMap& map_;

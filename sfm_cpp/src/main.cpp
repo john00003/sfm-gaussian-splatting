@@ -120,7 +120,7 @@ void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, 
     poses.push_back(pose2);
 }
 
-void runSfMOnly(char *folder) {
+void runSfMNoGUI(char *folder, bool sequential) {
     SfMMap map;
     std::vector<Eigen::Vector3d> current_points;
     std::vector<Eigen::Matrix4d> current_poses;
@@ -160,7 +160,7 @@ void runSfMOnly(char *folder) {
 
     IncrementalSfM sfm(map);
     std::cout << "[INFO] Initializing SfM..." << std::endl;
-    sfm.Initialize();
+    sfm.Initialize(sequential);
 
     for (int i = 2; i < (int)map.views.size(); ++i) {
 
@@ -222,13 +222,23 @@ void runSfMOnly(char *folder) {
 
 }
 
+// TODO: add sequential checkbox to gui
 int main(int argc, char** argv)
 {
-
+    bool sequential = true; // TODO: change to default to false
     if (argc > 1) {
+        if (argc == 4) {
+            if (strcmp(argv[1], "--sequential") == 0) {
+                sequential = true;
+            }
+            else {
+                std::cerr << "Third argument must be --sequential if provided! Exiting.\n";
+                return -1;
+            }
+        }
         if (strcmp(argv[1], "--no_gui") == 0) {
-            if (argc == 3) {
-                runSfMOnly(argv[2]);
+            if (argc >= 3) {
+                runSfMNoGUI(argv[2], sequential);
                 return 0;
             }
             else {
@@ -298,10 +308,9 @@ int main(int argc, char** argv)
 
                     IncrementalSfM sfm(map);
                     std::cout << "[INFO] Initializing SfM..." << std::endl;
-                    sfm.Initialize();
-
-                    for (int i = 2; i < (int)map.views.size(); ++i) {
-
+                    int bestViewId = sfm.Initialize(sequential); 
+                    // TODO: start registering from best views found by intiialize
+                    for (int i = bestViewId; i != map.views.size(); ++i) {
                         if (map.views[i].registered) continue;
 
                         std::cout << "[INFO] Registering view " << i << std::endl;
@@ -320,6 +329,72 @@ int main(int argc, char** argv)
                             registered_since_last_ba = 0;
                         }
                     }
+
+                    for (int i = bestViewId; i != 0; --i) {
+                        if (map.views[i].registered) continue;
+
+                        std::cout << "[INFO] Registering view " << i << std::endl;
+                        bool reg_ok = sfm.RegisterNextView(i);
+                        if (!reg_ok) {
+                            std::cerr << "[WARN] Failed to register view " << i << std::endl;
+                            continue;
+                        }
+                        std::cout << "[INFO] Triangulating new points for view " << i << std::endl;
+                        sfm.TriangulateNewPoints(i);
+
+                        registered_since_last_ba++;
+                        if (registered_since_last_ba >= 3) {
+                            std::cout << "[INFO] Running local bundle adjustment..." << std::endl;
+                            sfm.LocalBundleAdjust(i);
+                            registered_since_last_ba = 0;
+                        }
+                    }
+
+                    /*for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.end(); ++it) {
+                        
+                    }
+
+                    for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.begin(); --it) {
+                        if (map.views[i].registered) continue;
+
+                        std::cout << "[INFO] Registering view " << i << std::endl;
+                        bool reg_ok = sfm.RegisterNextView(i);
+                        if (!reg_ok) {
+                            std::cerr << "[WARN] Failed to register view " << i << std::endl;
+                            continue;
+                        }
+                        std::cout << "[INFO] Triangulating new points for view " << i << std::endl;
+                        sfm.TriangulateNewPoints(i);
+
+                        registered_since_last_ba++;
+                        if (registered_since_last_ba >= 3) {
+                            std::cout << "[INFO] Running local bundle adjustment..." << std::endl;
+                            sfm.LocalBundleAdjust(i);
+                            registered_since_last_ba = 0;
+                        }
+                    }*/
+                    
+
+                    /*for (int i = 2; i < (int)map.views.size(); ++i) {
+
+                        if (map.views[i].registered) continue;
+
+                        std::cout << "[INFO] Registering view " << i << std::endl;
+                        bool reg_ok = sfm.RegisterNextView(i);
+                        if (!reg_ok) {
+                            std::cerr << "[WARN] Failed to register view " << i << std::endl;
+                            continue;
+                        }
+                        std::cout << "[INFO] Triangulating new points for view " << i << std::endl;
+                        sfm.TriangulateNewPoints(i);
+
+                        registered_since_last_ba++;
+                        if (registered_since_last_ba >= 3) {
+                            std::cout << "[INFO] Running local bundle adjustment..." << std::endl;
+                            sfm.LocalBundleAdjust(i);
+                            registered_since_last_ba = 0;
+                        }
+                    }*/
 
                     std::cout << "[INFO] Running global bundle adjustment..." << std::endl;
                     sfm.BundleAdjust();
