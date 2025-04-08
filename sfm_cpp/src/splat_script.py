@@ -32,11 +32,13 @@ def conda():
 
 def train_gaussian_splat():
     gaussian_splat = GAUSSIAN_SPLAT_PATH + "train.py" # TODO: correct path + check if absolute is okay
-    flag_source = "--source_path=../out/" # TODO: correct path + check if relative is okay
+    flag_source = "--source_path=../out/window_with_anchor/" # TODO: correct path + check if relative is okay
     flag_model = "--model_path=C:\\github-repos\\sfm-gaussian-splatting\\sfm_cpp\\out\\trained"
     flag_iters = "--iterations=7000"
+    flag_debug = "--debug"
     # flags = "-s C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/ -m C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/trained/ --iterations 7000" # TODO: correct path + check if relative is okay
     try:
+        #result = subprocess.run([PYTHON, gaussian_splat, flag_source, flag_model, flag_iters, flag_debug], check=True, capture_output=True, text=True)
         result = subprocess.run([PYTHON, gaussian_splat, flag_source, flag_model, flag_iters], check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
         print("An error occurred while running the Gaussian Splatting training process.")

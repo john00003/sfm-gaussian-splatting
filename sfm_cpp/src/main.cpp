@@ -25,7 +25,7 @@ bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height,
 void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, std::vector<Eigen::Vector3d>& points3D, std::vector<Eigen::Vector3f>& colors) {
     std::vector<std::string> image_paths;
     for (const auto& entry : fs::directory_iterator(folder)) {
-        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
+        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
             image_paths.push_back(entry.path().string());
         }
     }
@@ -225,7 +225,8 @@ void runSfMNoGUI(char *folder, bool sequential) {
 // TODO: add sequential checkbox to gui
 int main(int argc, char** argv)
 {
-    bool sequential = true; // TODO: change to default to false
+    bool sequential = false; // TODO: change to default to false
+    bool johns_phone = false;
     if (argc > 1) {
         if (argc == 4) {
             if (strcmp(argv[1], "--sequential") == 0) {
@@ -288,10 +289,11 @@ int main(int argc, char** argv)
 
                     int id = 0;
                     for (const auto& entry : fs::directory_iterator(folder)) {
-                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
+
+                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
                             map.AddView(id, entry.path().string(), entry.path().filename().string());
                             auto& view = map.views[id];
-                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
+                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K, johns_phone)) {
                                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;
                             } else {
                                 std::cout << "[INFO] Intrinsics for view " << id << ":\n" << view.K << std::endl;
@@ -330,7 +332,7 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    for (int i = bestViewId; i != 0; --i) {
+                    for (int i = bestViewId; i >= 0; --i) {
                         if (map.views[i].registered) continue;
 
                         std::cout << "[INFO] Registering view " << i << std::endl;

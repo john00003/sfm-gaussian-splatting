@@ -14,7 +14,21 @@
 #include <cstdlib>
 #include <fstream>
 
-bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K) {
+bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K, bool johns_phone) {
+    if (johns_phone) {
+        float fx = 4131;
+        float fy = 4131;
+        float cx = 2856;
+        float cy = 2142;
+
+        K = (cv::Mat_<double>(3, 3) << fx, 0, cx,
+            0, fy, cy,
+            0, 0, 1);
+
+        return true;
+    }
+    
+
     try {
         auto image = Exiv2::ImageFactory::open(image_path);
         image->readMetadata();
@@ -169,28 +183,143 @@ void IncrementalSfM::FilterBadPointsAfterBA(float reproj_thresh) {
     map_.tracks = std::move(filtered);
 }
 
-std::vector<std::vector<cv::DMatch>> IncrementalSfM::MatchPair(View& v1, View& v2) {
+size_t IncrementalSfM::MatchPair(View& v1, View& v2) {
     std::vector<std::vector<cv::DMatch>> knn;
     cv::cuda::GpuMat v1_descriptors_gpu(v1.descriptors);
     cv::cuda::GpuMat v2_descriptors_gpu(v2.descriptors);
     matcher_->knnMatch(v1_descriptors_gpu, v2_descriptors_gpu, knn, 2);
     // TODO: will matches work for both images like this? will order be correct?
     v1.matches_map[v2.id] = knn;
-    // we reverse the matches to give to view 2
-    std::vector<std::vector<cv::DMatch>> reversed_knn;
 
-    for (int i = 0; i < knn.size(); ++i) {
-        std::vector<cv::DMatch> matches;
-        for (int j = 0; j < knn[i].size(); ++j) {
+    std::vector<std::vector<cv::DMatch>> knn_rev;
+    matcher_->knnMatch(v2_descriptors_gpu, v1_descriptors_gpu, knn_rev, 2);
+    v2.matches_map[v1.id] = knn_rev;
+    //// we reverse the matches to give to view 2
+    //std::vector<std::vector<cv::DMatch>> reversed_knn;
 
-            matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
-        }
-        reversed_knn.push_back(matches);
+    //for (int i = 0; i < knn.size(); ++i) {
+    //    std::vector<cv::DMatch> matches;
+    //    for (int j = 0; j < knn[i].size(); ++j) {
+
+    //        matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
+    //    }
+    //    reversed_knn.push_back(matches);
+    //}
+
+    //v2.matches_map[v1.id] = reversed_knn;
+
+    size_t good1 = 0;
+    for (const auto& m : knn) {
+        if (m.size() < 2) continue;
+        if (m[0].distance < 0.75f * m[1].distance) ++good1;
     }
 
-    v2.matches_map[v1.id] = reversed_knn;
+    size_t good2 = 0;
+    for (const auto& m : knn_rev) {
+        if (m.size() < 2) continue;
+        if (m[0].distance < 0.75f * m[1].distance) ++good2;
+    }
 
-    return knn;
+    if (good1 > good2) {
+        return good1;
+    }
+    return good2;
+}
+
+size_t IncrementalSfM::MatchViewsWindow(int* best_i, int* best_j, int window_size = 2, int anchor_interval = 10, int anchor_window = 10) {
+    size_t best_matches = 0;
+    std::vector<int> view_ids;
+    for (const auto& [id, _] : map_.views) {
+        view_ids.push_back(id);
+    }
+
+    for (size_t idx = 0; idx < view_ids.size(); ++idx) {
+        int i_id = view_ids[idx];
+        View& view_i = map_.views[i_id];
+
+        for (int offset = -window_size; offset <= window_size; ++offset) {
+
+
+            //  check to see if match is necessary: remember that MatchPair does both combinations of matches
+            if (offset == 0) continue;
+
+            int j_idx = static_cast<int>(idx) + offset;
+            if (offset < 0) {   
+                if (j_idx < 0) {
+                    j_idx = view_ids.size() + j_idx;
+                }
+                else {
+                    continue;   // we only need to loop backwards at the very start of the function
+                }
+            }
+            
+            if (j_idx >= static_cast<int>(view_ids.size())) {
+                continue;   // we don't need to loop forwards, since first views already looped backwards at the start of the function
+            }
+            if (j_idx < 0 || j_idx >= static_cast<int>(view_ids.size())) continue;
+
+
+
+            int j_id = view_ids[j_idx];
+            View& view_j = map_.views[j_id];
+
+            std::cout << "[INFO] Matching view " << i_id << " to view " << j_id << std::endl;
+
+            size_t good = MatchPair(view_i, view_j);
+
+            if (good > best_matches) {
+                best_matches = good;
+                *best_i = i_id;
+                *best_j = j_id;
+                std::cout << "[INFO] New best match: " << best_matches << " between " << i_id << " and " << j_id << std::endl;
+            }
+        }
+
+    }
+
+    // do anchor matching for long range correspondences
+    for (size_t idx = 0; idx < view_ids.size(); ++idx) {
+        int i_id = view_ids[idx];
+        if (i_id % anchor_interval != 0) continue; // only anchor frames
+
+        View& view_i = map_.views[i_id];
+
+        for (size_t jdx = 0; jdx < view_ids.size(); ++jdx) {
+            int j_id = view_ids[jdx];
+
+            if (i_id >= j_id) continue;
+
+            // skip pairs covered in previous loop
+            if (std::abs((int)i_id - (int)j_id) <= window_size) continue;
+
+            // get wrap around size
+            int distance = std::min(j_id - i_id, static_cast<int>(view_ids.size()) - j_id + i_id);
+
+            // limit to anchor window size
+            if (distance > anchor_window) continue;
+
+            View& view_j = map_.views[j_id];
+
+            std::cout << "[INFO] Anchor matching anchor view " << i_id << " to view " << j_id << std::endl;
+
+            size_t good = MatchPair(view_i, view_j);
+
+            if (good > best_matches) {
+                best_matches = good;
+                *best_i = i_id;
+                *best_j = j_id;
+                std::cout << "[INFO] New best match found in anchor: " << best_matches << " between " << i_id << " and " << j_id << std::endl;
+            }
+        }
+    }
+
+
+    if (*best_i == -1 || *best_j == -1) {
+        std::cerr << "[ERROR] Failed to find suitable initial image pair." << std::endl;
+        return 0;
+    }
+
+    return best_matches;
 }
 
 size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
@@ -209,13 +338,9 @@ size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
             std::cout << "[INFO] Matching key points in view " << view.id << " to view " << prev.id << std::endl;
             std::cout << "[INFO] Image names: " << view.image_path << " and " << prev.image_path << std::endl;
 
-            std::vector<std::vector<cv::DMatch>> knn = MatchPair(view, prev);
+            size_t good = MatchPair(view, prev);    // TODO: ordering wouldn't be right depending on which good was larger
 
-            size_t good = 0;
-            for (const auto& m : knn) {
-                if (m.size() < 2) continue;
-                if (m[0].distance < 0.75f * m[1].distance) ++good;
-            }
+            
 
             if (good > best_matches) {
                 best_matches = good;
@@ -230,13 +355,7 @@ size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
             std::cout << "[INFO] Matching key points in view " << view.id << " to view " << next.id << std::endl;
             std::cout << "[INFO] Image names: " << view.image_path << " and " << next.image_path << std::endl;
 
-            std::vector<std::vector<cv::DMatch>> knn = MatchPair(view, next);
-
-            size_t good = 0;
-            for (const auto& m : knn) {
-                if (m.size() < 2) continue;
-                if (m[0].distance < 0.75f * m[1].distance) ++good;
-            }
+            size_t good = MatchPair(view, prev);    // TODO: ordering wouldn't be right depending on which good was larger
 
             if (good > best_matches) {
                 best_matches = good;
@@ -383,7 +502,7 @@ int IncrementalSfM::Initialize(bool sequential) {
 
     size_t best_matches;
     if (sequential) {
-        best_matches = MatchViewsSequential(&best_i, &best_j);
+        best_matches = MatchViewsWindow(&best_i, &best_j);
     }
     else {
         best_matches = MatchViewsBF(&best_i, &best_j);
@@ -1050,6 +1169,7 @@ void IncrementalSfM::Write3DPoints() {
         //if (++id % 1000 == 0) {
         //    std::cout << "[INFO] Finished writing " << id << std::endl;
         //}
+        ++id;
     }
     points3DFile << str;
     points3DFile.close();
@@ -1073,9 +1193,14 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     // TODO: is GetIntrinsicsFromExif used anywhere?
     View representative_cam = map_.views.begin()->second;
     cv::Mat intrinsics = representative_cam.K;
+    // TODO: why intinsics being bad?
+    // TODO: we can manually edit cameras.txt
+    std::cout << "[INFO] Intrinsics for view " << representative_cam.id << ":\n" << representative_cam.K << std::endl;
+    std::cout << "Matrix type: " << intrinsics.type() << std::endl;
     cameraFile << 1 << " SIMPLE_PINHOLE " << representative_cam.image.cols << " " << representative_cam.image.rows << " " << intrinsics.at<float>(0, 0) << " " << intrinsics.at<float>(0, 2) << " " << intrinsics.at<float>(1, 2) << "\n";
     cameraFile.close();
     
+    // TODO: see if it is correct to not save views that didn't get registered
     std::cout << "[INFO] Writing images.txt" << std::endl;
     std::ofstream imageFile;
     imageFile.open("..\\..\\images.txt");
@@ -1084,6 +1209,9 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     // for (auto it = num_map.begin(); it != num_map.end(); ++it)
     for (auto it = map_.views.begin(); it != map_.views.end(); ++it) {
         View view = it->second;
+        if (!view.registered) {
+            continue;
+        }
         Eigen::Quaterniond q(view.pose.block<3,3>(0,0));
         imageFile << view.id << " " << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << " " << view.pose(0, 3) << " " << view.pose(1, 3) << " " << view.pose(2, 3) << " " << 1 << " " << view.image_path << "\n";
         for (auto it1 = view.points_3d.begin(); it1 != view.points_3d.end(); ++it1) {
