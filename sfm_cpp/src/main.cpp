@@ -25,7 +25,7 @@ bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height,
 void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, std::vector<Eigen::Vector3d>& points3D, std::vector<Eigen::Vector3f>& colors) {
     std::vector<std::string> image_paths;
     for (const auto& entry : fs::directory_iterator(folder)) {
-        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
+        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
             image_paths.push_back(entry.path().string());
         }
     }
@@ -115,12 +115,12 @@ void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, 
     Eigen::Vector3d t_e;
     cv::cv2eigen(R, R_e);
     cv::cv2eigen(t, t_e);
-    pose2.block<3,3>(0,0) = R_e;
-    pose2.block<3,1>(0,3) = t_e;
+    pose2.block<3, 3>(0, 0) = R_e;
+    pose2.block<3, 1>(0, 3) = t_e;
     poses.push_back(pose2);
 }
 
-void runSfMNoGUI(char *folder, bool sequential) {
+void runSfMNoGUI(char* folder, bool sequential) {
     SfMMap map;
     std::vector<Eigen::Vector3d> current_points;
     std::vector<Eigen::Matrix4d> current_poses;
@@ -225,8 +225,7 @@ void runSfMNoGUI(char *folder, bool sequential) {
 // TODO: add sequential checkbox to gui
 int main(int argc, char** argv)
 {
-    bool sequential = false; // TODO: change to default to false
-    bool johns_phone = false;
+    bool sequential = true; // TODO: change to default to false
     if (argc > 1) {
         if (argc == 4) {
             if (strcmp(argv[1], "--sequential") == 0) {
@@ -246,7 +245,7 @@ int main(int argc, char** argv)
                 std::cerr << "Must provide folder with --no_gui flag! Exiting.\n";
                 return -1;
             }
-            
+
         }
         else {
             std::cerr << "First argument must be --no_gui! Exiting.\n";
@@ -289,13 +288,13 @@ int main(int argc, char** argv)
 
                     int id = 0;
                     for (const auto& entry : fs::directory_iterator(folder)) {
-
-                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
+                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
                             map.AddView(id, entry.path().string(), entry.path().filename().string());
                             auto& view = map.views[id];
-                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K, johns_phone)) {
+                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
                                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;
-                            } else {
+                            }
+                            else {
                                 std::cout << "[INFO] Intrinsics for view " << id << ":\n" << view.K << std::endl;
                             }
                             id++;
@@ -310,7 +309,7 @@ int main(int argc, char** argv)
 
                     IncrementalSfM sfm(map);
                     std::cout << "[INFO] Initializing SfM..." << std::endl;
-                    int bestViewId = sfm.Initialize(sequential); 
+                    int bestViewId = sfm.Initialize(sequential);
                     // TODO: start registering from best views found by intiialize
                     for (int i = bestViewId; i != map.views.size(); ++i) {
                         if (map.views[i].registered) continue;
@@ -332,7 +331,7 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    for (int i = bestViewId; i >= 0; --i) {
+                    for (int i = bestViewId; i != 0; --i) {
                         if (map.views[i].registered) continue;
 
                         std::cout << "[INFO] Registering view " << i << std::endl;
@@ -353,7 +352,7 @@ int main(int argc, char** argv)
                     }
 
                     /*for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.end(); ++it) {
-                        
+
                     }
 
                     for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.begin(); --it) {
@@ -375,7 +374,7 @@ int main(int argc, char** argv)
                             registered_since_last_ba = 0;
                         }
                     }*/
-                    
+
 
                     /*for (int i = 2; i < (int)map.views.size(); ++i) {
 
@@ -415,7 +414,8 @@ int main(int argc, char** argv)
                                 const auto& kp = view.keypoints[obs.second];
                                 const cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
                                 current_colors.emplace_back(bgr[2] / 255.f, bgr[1] / 255.f, bgr[0] / 255.f);
-                            } else {
+                            }
+                            else {
                                 current_colors.emplace_back(1.0f, 1.0f, 0.0f);
                             }
                         }
@@ -428,17 +428,17 @@ int main(int argc, char** argv)
                         }
 
                         std::cout << "[INFO] Visualization ready with "
-                                  << current_points.size() << " points and "
-                                  << current_poses.size() << " camera poses." << std::endl;
+                            << current_points.size() << " points and "
+                            << current_poses.size() << " camera poses." << std::endl;
                     }
 
                     sfm.GenerateCOLMAPOutput();
 
                     viewer_pending = true;
                     running = false;
-                }).detach();
+                    }).detach();
             }
-        });
+            });
 
         if (viewer_pending) {
             std::lock_guard<std::mutex> lock(result_mutex);
