@@ -45,4 +45,4 @@ Navigate to the directory where you installed the Gaussian Splatting viewer. Use
 
 [4] Structure-from-Motion Revisited (https://openaccess.thecvf.com/content_cvpr_2016/papers/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.pdf)
 
-[4] Multiple View Geometry in Computer Vision (https://www.cambridge.org/core/books/multiple-view-geometry-in-computer-vision/0B6F289C78B2B23F596CAA76D3D43F7A)
+[5] Multiple View Geometry in Computer Vision (https://www.cambridge.org/core/books/multiple-view-geometry-in-computer-vision/0B6F289C78B2B23F596CAA76D3D43F7A)
