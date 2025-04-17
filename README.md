@@ -5,6 +5,11 @@ We created an incremental Structure-from-Motion (SfM) algorithm similar to COLMA
 
 We used Gaussian Splatting [1,2] to visualize create a rendering of our results, and compared the rendering quality associated with accuracy of the the 3D point clouds used for initialization.
 
+<p align="center">
+  <img src="https://github.com/john00003/sfm-gaussian-splatting/blob/john_reverted_matching/sfm_cpp/out/colmap_minimal_more/COLMAP%20data%20demo.gif" width=600 height=400/>
+  <img src="https://github.com/john00003/sfm-gaussian-splatting/blob/john_reverted_matching/sfm_cpp/out/colmap_minimal_more/splat_smaller.gif" width=600 height=400/>
+</p>
+
 ## Installation Instructions
 
 ### SfM Installation
