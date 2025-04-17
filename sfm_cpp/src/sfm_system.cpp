@@ -189,25 +189,11 @@ size_t IncrementalSfM::MatchPair(View& v1, View& v2) {
     cv::cuda::GpuMat v1_descriptors_gpu(v1.descriptors);
     cv::cuda::GpuMat v2_descriptors_gpu(v2.descriptors);
     matcher_->knnMatch(v1_descriptors_gpu, v2_descriptors_gpu, knn, 2);
-    // TODO: will matches work for both images like this? will order be correct?
     v1.matches_map[v2.id] = knn;
 
     std::vector<std::vector<cv::DMatch>> knn_rev;
     matcher_->knnMatch(v2_descriptors_gpu, v1_descriptors_gpu, knn_rev, 2);
     v2.matches_map[v1.id] = knn_rev;
-    //// we reverse the matches to give to view 2
-    //std::vector<std::vector<cv::DMatch>> reversed_knn;
-
-    //for (int i = 0; i < knn.size(); ++i) {
-    //    std::vector<cv::DMatch> matches;
-    //    for (int j = 0; j < knn[i].size(); ++j) {
-
-    //        matches.push_back(cv::DMatch(knn[i][j].trainIdx, knn[i][j].queryIdx, knn[i][j].distance));
-    //    }
-    //    reversed_knn.push_back(matches);
-    //}
-
-    //v2.matches_map[v1.id] = reversed_knn;
 
     size_t good1 = 0;
     for (const auto& m : knn) {
@@ -240,7 +226,6 @@ size_t IncrementalSfM::MatchViewsWindow(int* best_i, int* best_j, int window_siz
 
         for (int offset = -window_size; offset <= window_size; ++offset) {
 
-
             //  check to see if match is necessary: remember that MatchPair does both combinations of matches
             if (offset == 0) continue;
 
@@ -258,8 +243,6 @@ size_t IncrementalSfM::MatchViewsWindow(int* best_i, int* best_j, int window_siz
                 continue;   // we don't need to loop forwards, since first views already looped backwards at the start of the function
             }
             if (j_idx < 0 || j_idx >= static_cast<int>(view_ids.size())) continue;
-
-
 
             int j_id = view_ids[j_idx];
             View& view_j = map_.views[j_id];
@@ -339,7 +322,7 @@ size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
             std::cout << "[INFO] Matching key points in view " << view.id << " to view " << prev.id << std::endl;
             std::cout << "[INFO] Image names: " << view.image_path << " and " << prev.image_path << std::endl;
 
-            size_t good = MatchPair(view, prev);    // TODO: ordering wouldn't be right depending on which good was larger
+            size_t good = MatchPair(view, prev);    
 
 
             if (good > best_matches) {
@@ -355,7 +338,7 @@ size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
             std::cout << "[INFO] Matching key points in view " << view.id << " to view " << next.id << std::endl;
             std::cout << "[INFO] Image names: " << view.image_path << " and " << next.image_path << std::endl;
 
-            size_t good = MatchPair(view, prev);    // TODO: ordering wouldn't be right depending on which good was larger
+            size_t good = MatchPair(view, prev);    
 
 
             if (good > best_matches) {
@@ -369,56 +352,7 @@ size_t IncrementalSfM::MatchViewsSequential(int* best_i, int* best_j) {
 
     }
 
-    // NOW: we make matches transitive
-    // i.e., if a kp in image 0 matches with a kp in image 1
-        // then that kp in image 1 matches with a kp in image 2
-        // we never try to match image 0 to image 1
-            // so instead, we follow matches
 
-    // after sequential matching, each View object matches_map will have two entries: prev.id = {} next.id = {}
-    // ASSUME PROCEDURE IS ONLY FOR NEXT
-    // so we can look at next 
-    // // actually, check len of each vector, see what depth the dimension of 2 is in
-    // for each match in std::vector<std::vector<cv::DMatch>>
-        // for best and second best match in std::vector<cv::DMatch>
-            // query descriptor is kp in original image: set ORIG_QUERY to query
-            // train descriptor is kp in next: set CURR_TRAIN to train
-            // look in next.matches_map[(next+1)], using CURR_TRAIN as the query descriptor, to see if CURR_TRAIN matches with anything in next image
-                // if yes, add match to ORIG_QUERY: ORIG_QUERY matches with new train
-                // and add reversed match to image with new train!
-                // update CURR_TRAIN to new train
-            // iteratively repeat, until (next+1 == n || next.matches_map[(next+1)] has no entry for CURR_TRAIN)
-
-    //for (auto view = map_.views.begin(); view != map_.views.end(); ++view) {    // iterate through each view
-    //    if (std::next(view) == map_.views.end()) {
-    //        break;
-    //    }
-    //    View next = std::next(view)->second;
-    //    for (auto match = view->second.matches_map[next.id].begin(); match != view->second.matches_map[next.id].end(); ++match) {   // iterate through all the key points of view 
-    //        for (auto best = match->begin(); best != match->end(); ++best) {    // iterate through first and second best match for a given key point
-    //            int orig_query = best->queryIdx;
-    //            int curr_train = best->trainIdx;
-    //            std::map<int, View>::iterator curr_next = std::next(std::next(view));
-
-    //            while (curr_next != map_.views.end() && !curr_next->second.matches_map[curr_train].empty()) {
-    //                std::vector<cv::DMatch> new_matches;
-    //                curr_next->second.matches_map[curr_train][]
-    //                cv::DMatch best_match(orig_query, (*match)[0].distance * 1.1)
-    //                if (std::map<int, std::vector<std::vector<cv::DMatch>>>::iterator search = view->second.matches_map.find(curr_next->second.id); search != view->second.matches_map.end()) {
-    //                    // we add this point to the entry in matches_map
-    //                    
-
-    //                    search->second.push_back()
-    //                }
-    //                else {
-    //                    // we make a new entry in matches_map
-    //                }
-    //            }
-
-
-    //        }
-    //    }
-    //}
 
     if (*best_i == -1 || *best_j == -1) {
         std::cerr << "[ERROR] Failed to find suitable initial image pair." << std::endl;
@@ -433,7 +367,6 @@ size_t IncrementalSfM::MatchViewsBF(int* best_i, int* best_j) {
 
     for (auto it1 = map_.views.begin(); it1 != map_.views.end(); ++it1) {
         for (auto it2 = std::next(it1); it2 != map_.views.end(); ++it2) {
-            // TODO: did they have to be const?
             auto& v1 = it1->second;
             auto& v2 = it2->second;
             std::cout << "[INFO] Matching key points in view " << v1.id << " to view " << v2.id << std::endl;
@@ -468,8 +401,6 @@ int IncrementalSfM::Initialize(bool sequential) {
     for (auto& [id, view] : map_.views) {
         if (view.keypoints.empty()) {
             std::cout << "[INFO] Detecting key points with sift for view " << id << std::endl;
-            // TODO: see if GPU version exists
-            // also, try to attach RGB color to the view, make a parallel array of colors that goes with keypoints.
             sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
             std::cout << "[INFO] Attatching colors to keypoints for view " << id << std::endl;
             for (auto& kp : view.keypoints) {
@@ -499,8 +430,6 @@ int IncrementalSfM::Initialize(bool sequential) {
 void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
     std::vector<std::vector<cv::DMatch>> knn = v1.matches_map[v2.id];
     std::cout << "[INFO] Number of matches inside function:  " << knn.size() << std::endl;
-    //std::vector<std::vector<cv::DMatch>> knn;
-    //matcher_.knnMatch(v1.descriptors, v2.descriptors, knn, 2);
 
     std::vector<cv::DMatch> good;
     for (auto& m : knn) {
@@ -605,8 +534,6 @@ void IncrementalSfM::PerformInitialPair(View& v1, View& v2) {
 std::vector<cv::DMatch> IncrementalSfM::MatchAndFilterKNN(
     const cv::Mat& desc1, const cv::Mat& desc2, View v1, View v2) const
 {
-    //std::vector<std::vector<cv::DMatch>> knn;
-    //matcher_.knnMatch(desc1, desc2, knn, 2);
     std::vector<std::vector<cv::DMatch>> knn = v1.matches_map[v2.id];
 
     std::vector<cv::DMatch> good;
@@ -625,9 +552,6 @@ bool IncrementalSfM::RegisterNextView(int view_id) {
     if (view.registered) {
         return false;
     }
-    // TODO: why do we do this again? we already do this in initialize
-    //std::cout << "[INFO] Detecting key points with sift for view " << view_id << std::endl;
-    //sift_->detectAndCompute(view.image, cv::noArray(), view.keypoints, view.descriptors);
 
     std::vector<cv::Point3f> pts3D;
     std::vector<cv::Point2f> pts2D;
@@ -988,85 +912,6 @@ void IncrementalSfM::LocalBundleAdjust(int current_view_id) {
     }
 }
 
-void IncrementalSfM::WriteToBinary() {
-    std::ofstream points3DFile("points3D.bin", std::ios::binary);
-    int id = 0;
-    // initialize counter to assign 3D point IDs
-        // TODO: see if 3D points already have IDs
-
-    for (const Track& track : map_.tracks) {
-        // TODO: get RGB value or initialize to some random color
-        // TODO: get error
-        std::vector<cv::Vec3b> colors; // we track the average color across all images
-        // TODO: check if observation keys are correct that we use for maps
-        for (const std::pair<int, int>& observation : track.observations) {
-            View view = map_.views[observation.first];
-            cv::KeyPoint kp = view.keypoints[observation.second];
-            cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
-            colors.push_back(bgr);
-        }
-        int R = 0, G = 0, B = 0, n = 0;
-        for (auto it = colors.begin(); it != colors.end(); ++it) {
-            ++n;
-            B += (*it)[0];
-            G += (*it)[1];
-            R += (*it)[2];
-        }
-
-        B /= n;
-        G /= n;
-        R /= n;
-
-        //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
-
-        int error = 0;
-        points3DFile.write(reinterpret_cast<const char*>(&id), sizeof(id));
-        points3DFile.write(reinterpret_cast<const char*>(&track.point[0]), sizeof(track.point[0]));
-        points3DFile.write(reinterpret_cast<const char*>(&track.point[1]), sizeof(track.point[1]));
-        points3DFile.write(reinterpret_cast<const char*>(&track.point[2]), sizeof(track.point[2]));
-        points3DFile.write(reinterpret_cast<const char*>(&R), sizeof(R));
-        points3DFile.write(reinterpret_cast<const char*>(&G), sizeof(G));
-        points3DFile.write(reinterpret_cast<const char*>(&B), sizeof(B));
-        points3DFile.write(reinterpret_cast<const char*>(&error), sizeof(error));
-        size_t numObservations = track.observations.size();
-        std::cout << "[INFO] Observations of size " << numObservations << std::endl;
-        for (const std::pair<int, int>& observation : track.observations) {
-            points3DFile.write(reinterpret_cast<const char*>(&observation.first), sizeof(observation.first));
-            points3DFile.write(reinterpret_cast<const char*>(&observation.second), sizeof(observation.second));
-        }
-        points3DFile.write("\n", 1);
-        ++id;
-    }
-    points3DFile.close();
-}
-
-void IncrementalSfM::GetPointColor(const Track& track, std::vector<cv::Mat> images, int *R_p, int *G_p, int*B_p) {
-    std::vector<cv::Vec3b> colors; // we track the average color across all images
-    for (const std::pair<int, int>& observation : track.observations) {
-        View view = map_.views[observation.first];
-        cv::KeyPoint kp = view.keypoints[observation.second];
-        cv::Vec3b& bgr = images[view.id].at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
-        colors.push_back(bgr);
-    }
-    int R = 0, G = 0, B = 0, n = 0;
-    for (auto it = colors.begin(); it != colors.end(); ++it) {
-        ++n;
-        B += (*it)[0];
-        G += (*it)[1];
-        R += (*it)[2];
-    }
-
-    B /= n;
-    G /= n;
-    R /= n;
-
-    *B_p = B;
-    *G_p = G;
-    *R_p = R;
-
-    
-}
-
 void IncrementalSfM::Write3DPoints() {
 
     std::cout << "[INFO] Writing points3D.txt" << std::endl;
@@ -1074,51 +919,19 @@ void IncrementalSfM::Write3DPoints() {
     std::vector<char> fileBuffer(1048576);  // 1 MB buffer allocated on the heap
     points3DFile.rdbuf()->pubsetbuf(fileBuffer.data(), fileBuffer.size());
     int id = 0;
-    // initialize counter to assign 3D point IDs
-        // TODO: see if 3D points already have IDs
-    int iter = 1048576 / (48 + 10 * static_cast<int>(map_.views.size())) - 20; //subtract 20 to add some room for error
+    int iter = 1048576 / (48 + 10 * static_cast<int>(map_.views.size())) - 20; // subtract 20 to add some room for error
     int current_iter = 0;
-    std::ostringstream oss; // Efficiently format the string
-    oss.precision(6); // Set floating-point precision
+    std::ostringstream oss; 
+    oss.precision(6); 
     std::string str;    // str acts as buffer for large group of 3D points for less accesses to file
     str.reserve(1048576); // reserve 1MB 
-
-    // load the images into the heap once to reduce I/O
-    //std::vector<cv::Mat> images;
-    //for (int i = 0; i < map_.views.size(); ++i) {
-    //    images.push_back(map_.views[i].image);
-    //}
 
     std::cout << "[INFO] Size of tracks " << map_.tracks.size() << std::endl;
     
     for (const Track& track : map_.tracks) {
-        // TODO: get error
-        
-        // TODO: check if observation keys are correct that we use for maps
-        
         int R = track.color[2], G = track.color[1], B = track.color[0];
-        //GetPointColor(track, images, &R, &G, &B);
 
         int error = 0;
-
-        // TODO: get upper bound on number of bytes written per iteration, and then write to the file every n iterations
-        //assume 6 digit 3dpoint id : 6 bytes
-        // space:                   : 1 byte
-        // 8 digits for each float  : 3*(8bytes)
-        // space:                   : 3 byte
-        // 3 digits for each rgb    : 3*(3bytes)
-        // space:                   : 3 byte
-        // 1 digit for camera       : 1 byte
-        // space:                   : 1 byte
-        // then calculate number of matches
-        //                          : (3 + 6 + 1)*n bytes (last space will be \n instead of space so formula works)
-        //                          = 48 + (10)*n bytes per string  where n is upper bounded by number of images                
-        //if (current_iter > iter) {
-        //    // write string to file
-        //    points3DFile << str;
-        //    current_iter = 0;
-        //    str.clear();
-        //}
 
         oss.str(""); // Reset content
         oss << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2]
@@ -1131,23 +944,11 @@ void IncrementalSfM::Write3DPoints() {
 
         str.append(oss.str());
 
-        //snprintf(buffer, 1024, "%d %f %f %f %d %d %d %d", id, track.point[0], track.point[1], track.point[2], R, G, B, error);
-        //str.append(buffer);
-
-        //for (const std::pair<int, int>& observation : track.observations) {
-        //    snprintf(buffer, 1024, " %d %d", observation.first, observation.second);
-        //    str.append(buffer);
-        //}
-        //str.append("\n");
-
         if (++current_iter > iter) {
             points3DFile << str; // Flush buffer
             current_iter = 0;
             str.clear();
         }
-        //if (++id % 1000 == 0) {
-        //    std::cout << "[INFO] Finished writing " << id << std::endl;
-        //}
         ++id;
     }
     points3DFile << str;
@@ -1166,26 +967,17 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
 
     std::cout << "[INFO] Writing cameras.txt" << std::endl;
     std::ofstream cameraFile;
-    // open cameras.txt
     cameraFile.open("..\\..\\cameras.txt");
-    // TODO: check if we should use pinhole or opencv cam. gaussian splat wants pinhole, but do we need to do further conversion?
-    // TODO: is GetIntrinsicsFromExif used anywhere?
     View representative_cam = map_.views.begin()->second;
     cv::Mat intrinsics = representative_cam.K;
-    // TODO: why intinsics being bad?
-    // TODO: we can manually edit cameras.txt
     std::cout << "[INFO] Intrinsics for view " << representative_cam.id << ":\n" << representative_cam.K << std::endl;
     std::cout << "Matrix type: " << intrinsics.type() << std::endl;
     cameraFile << 1 << " SIMPLE_PINHOLE " << representative_cam.image.cols << " " << representative_cam.image.rows << " " << intrinsics.at<double>(0, 0) << " " << intrinsics.at<double>(0, 2) << " " << intrinsics.at<double>(1, 2) << "\n";
     cameraFile.close();
     
-    // TODO: see if it is correct to not save views that didn't get registered
     std::cout << "[INFO] Writing images.txt" << std::endl;
     std::ofstream imageFile;
     imageFile.open("..\\..\\images.txt");
-    // open images.txt
-    // iterate through map_.views
-    // for (auto it = num_map.begin(); it != num_map.end(); ++it)
     for (auto it = map_.views.begin(); it != map_.views.end(); ++it) {
         View view = it->second;
         if (!view.registered) {
@@ -1200,49 +992,7 @@ void IncrementalSfM::GenerateCOLMAPOutput(){
     }
     imageFile.close();
 
-    //std::cout << "[INFO] Writing points3D.bin" << std::endl;
-    //WriteToBinary();
     Write3DPoints();
-    //std::cout << "[INFO] Writing points3D.txt" << std::endl;
-    //std::ofstream points3DFile;
-    //points3DFile.open("points3D.txt");
-    //int id = 0;
-    //// initialize counter to assign 3D point IDs
-    //    // TODO: see if 3D points already have IDs
-    //
-    //for (const Track& track : map_.tracks) {
-    //    // TODO: get error
-    //    std::vector<cv::Vec3b> colors; // we track the average color across all images
-    //    // TODO: check if observation keys are correct that we use for maps
-    //    for (const std::pair<int, int>& observation : track.observations) {
-    //        View view = map_.views[observation.first];
-    //        cv::KeyPoint kp = view.keypoints[observation.second];
-    //        cv::Vec3b& bgr = view.image.at<cv::Vec3b>(cvRound(kp.pt.y), cvRound(kp.pt.x));
-    //        colors.push_back(bgr);
-    //    }
-    //    int R = 0, G = 0, B = 0, n = 0;
-    //    for (auto it = colors.begin(); it != colors.end(); ++it) {
-    //        ++n;
-    //        B += (*it)[0];
-    //        G += (*it)[1];
-    //        R += (*it)[2];
-    //    }
-
-    //    B /= n;
-    //    G /= n;
-    //    R /= n;
-
-    //    //std::cout << "[INFO] Assigning RGB value to point " << R << " " << G << " " << B << std::endl;
-    //    
-    //    int error = 0;
-    //    points3DFile << id << " " << track.point[0] << " " << track.point[1] << " " << track.point[2] << " " << R << " " << G << " " << B << " " << error;
-    //    for (const std::pair<int, int>& observation : track.observations) {
-    //        points3DFile << " " << observation.first << " " << observation.second;  // TODO: ensure this is same order as COLMAP
-    //    }
-    //    points3DFile << "\n";
-    //    ++id;
-    //}
-    //points3DFile.close();
 
     std::cout << "[INFO] Invoking Python script" << std::endl;
 

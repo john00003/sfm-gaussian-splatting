@@ -355,52 +355,6 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    /*for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.end(); ++it) {
-
-                    }
-
-                    for (auto& it = std::next(map.views.begin(), bestViewId); it != map.views.begin(); --it) {
-                        if (map.views[i].registered) continue;
-
-                        std::cout << "[INFO] Registering view " << i << std::endl;
-                        bool reg_ok = sfm.RegisterNextView(i);
-                        if (!reg_ok) {
-                            std::cerr << "[WARN] Failed to register view " << i << std::endl;
-                            continue;
-                        }
-                        std::cout << "[INFO] Triangulating new points for view " << i << std::endl;
-                        sfm.TriangulateNewPoints(i);
-
-                        registered_since_last_ba++;
-                        if (registered_since_last_ba >= 3) {
-                            std::cout << "[INFO] Running local bundle adjustment..." << std::endl;
-                            sfm.LocalBundleAdjust(i);
-                            registered_since_last_ba = 0;
-                        }
-                    }*/
-
-
-                    /*for (int i = 2; i < (int)map.views.size(); ++i) {
-
-                        if (map.views[i].registered) continue;
-
-                        std::cout << "[INFO] Registering view " << i << std::endl;
-                        bool reg_ok = sfm.RegisterNextView(i);
-                        if (!reg_ok) {
-                            std::cerr << "[WARN] Failed to register view " << i << std::endl;
-                            continue;
-                        }
-                        std::cout << "[INFO] Triangulating new points for view " << i << std::endl;
-                        sfm.TriangulateNewPoints(i);
-
-                        registered_since_last_ba++;
-                        if (registered_since_last_ba >= 3) {
-                            std::cout << "[INFO] Running local bundle adjustment..." << std::endl;
-                            sfm.LocalBundleAdjust(i);
-                            registered_since_last_ba = 0;
-                        }
-                    }*/
-
                     std::cout << "[INFO] Running global bundle adjustment..." << std::endl;
                     sfm.BundleAdjust();
 

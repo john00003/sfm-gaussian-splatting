@@ -400,16 +400,6 @@ def write_images_text(images, path):
 
 
 if __name__ == "__main__":
-    # TODO: get this working with generated files
-    # Traceback (most recent call last):
-    #File "C:\github-repos\sfm-gaussian-splatting\sfm_cpp\src\convert_script.py", line 370, in <module>
-    #  cameras = read_cameras_text(path + "cameras.txt")
-    #File "C:\github-repos\sfm-gaussian-splatting\sfm_cpp\src\convert_script.py", line 85, in read_cameras_text
-     #  with open(path, "r") as fid:
-    #FileNotFoundError: [Errno 2] No such file or directory: '../out/build/x64-Release/cameras.txt'
-    #Error while converting camera, images, and 3D point files, and converting them to binary.
-
-
     #path = "../out/window_with_anchor/" 
     #binary_path = "../out/" # TODO: make sure we don't need to escape the backslash
 
@@ -418,8 +408,6 @@ if __name__ == "__main__":
 
     #cameras = read_cameras_text(path + "cameras.txt")
     #write_cameras_binary(cameras, os.path.join(binary_path, "cameras.bin"))
-
-
 
     os.makedirs(binary_path, exist_ok=True)
 

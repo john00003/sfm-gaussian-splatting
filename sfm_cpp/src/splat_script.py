@@ -1,4 +1,6 @@
 # this script will perform the complete SfM reconstruction, Gaussian Splatting training, and launch the visualizer
+# NOTE: This script is totally deprecated, and hasn't been used. The Python subprocess function makes running the Gaussian
+# Splatting training terribly slow.
 import subprocess
 
 
