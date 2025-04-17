@@ -33,7 +33,7 @@ target_include_directories(ImGui PUBLIC
   ${imgui_SOURCE_DIR}/backends
 )
 
-find_package(Ceres REQUIRED)
+find_package(Ceres REQUIRED COMPONENTS EigenSparse)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Pangolin REQUIRED)

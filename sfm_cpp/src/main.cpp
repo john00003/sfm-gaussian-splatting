@@ -20,12 +20,12 @@
 
 namespace fs = std::filesystem;
 
-bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K);
+bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K, bool johns_phone);
 
 void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, std::vector<Eigen::Vector3d>& points3D, std::vector<Eigen::Vector3f>& colors) {
     std::vector<std::string> image_paths;
     for (const auto& entry : fs::directory_iterator(folder)) {
-        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
+        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
             image_paths.push_back(entry.path().string());
         }
     }
@@ -43,12 +43,14 @@ void runSfMOnly(const std::string& folder, std::vector<Eigen::Matrix4d>& poses, 
     auto sift = cv::SIFT::create();
     cv::BFMatcher matcher(cv::NORM_L2);
 
+    bool johns_phone = true;
+
     for (const auto& path : image_paths) {
         cv::Mat img = cv::imread(path);
         if (img.empty()) continue;
         images.push_back(img);
         cv::Mat K;
-        if (!GetIntrinsicsFromExif(path, img.cols, img.rows, K)) {
+        if (!GetIntrinsicsFromExif(path, img.cols, img.rows, K, johns_phone)) {
             std::cerr << "[WARN] Missing EXIF in: " << path << std::endl;
             continue;
         }
@@ -127,6 +129,7 @@ void runSfMNoGUI(char* folder, bool sequential) {
     std::vector<Eigen::Vector3f> current_colors;
 
     int registered_since_last_ba = 0;
+    bool johns_phone = true;
 
     std::cout << "[INFO] SfM started on folder: " << folder << std::endl;
 
@@ -140,10 +143,10 @@ void runSfMNoGUI(char* folder, bool sequential) {
 
     int id = 0;
     for (const auto& entry : fs::directory_iterator(folder)) {
-        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
+        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
             map.AddView(id, entry.path().string(), entry.path().filename().string());
             auto& view = map.views[id];
-            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
+            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K, johns_phone)) {
                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;
             }
             else {
@@ -226,6 +229,7 @@ void runSfMNoGUI(char* folder, bool sequential) {
 int main(int argc, char** argv)
 {
     bool sequential = true; // TODO: change to default to false
+    bool johns_phone = false;
     if (argc > 1) {
         if (argc == 4) {
             if (strcmp(argv[1], "--sequential") == 0) {
@@ -288,10 +292,10 @@ int main(int argc, char** argv)
 
                     int id = 0;
                     for (const auto& entry : fs::directory_iterator(folder)) {
-                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG") {
+                        if (entry.path().extension() == ".jpg" || entry.path().extension() == ".JPG" || entry.path().extension() == ".jpeg" || entry.path().extension() == ".JPEG") {
                             map.AddView(id, entry.path().string(), entry.path().filename().string());
                             auto& view = map.views[id];
-                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K)) {
+                            if (!GetIntrinsicsFromExif(entry.path().string(), view.image.cols, view.image.rows, view.K, johns_phone)) {
                                 std::cerr << "[WARN] Missing EXIF intrinsics for " << entry.path() << std::endl;
                             }
                             else {

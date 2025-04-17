@@ -35,7 +35,7 @@ struct SfMMap {
     void AddObservation(int view_id, int kp_idx, int track_id);
 };
 
-bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K);
+bool GetIntrinsicsFromExif(const std::string& image_path, int width, int height, cv::Mat& K, bool johns_phone);
 
 class IncrementalSfM {
 public:
@@ -51,9 +51,10 @@ public:
     void WriteToBinary();
     void Write3DPoints();
     void GetPointColor(const Track& track, std::vector<cv::Mat> images, int* R_p, int* G_p, int* B_p);
-    std::vector<std::vector<cv::DMatch>> MatchPair(View& v1, View& v2);
+    size_t MatchPair(View& v1, View& v2);
     size_t MatchViewsBF(int* best_i, int* best_j);
     size_t MatchViewsSequential(int* best_i, int* best_j);
+    size_t MatchViewsWindow(int* best_i, int* best_j, int window_size, int anchor_interval, int anchor_window);
 
 private:
     SfMMap& map_;
