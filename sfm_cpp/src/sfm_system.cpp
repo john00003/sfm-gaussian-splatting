@@ -155,6 +155,10 @@ bool IsGoodTriangulatedPoint(const cv::Point2f& pt1, const cv::Point2f& pt2,
     return err1 < reproj_thresh && err2 < reproj_thresh;
 }
 
+void IncrementalSfM::SetUseWindowAnchor(bool flag) {
+    use_window_anchor_ = flag;
+}
+
 void IncrementalSfM::FilterBadPointsAfterBA(float reproj_thresh) {
     std::vector<Track> filtered;
     for (const auto& track : map_.tracks) {
@@ -391,7 +395,6 @@ size_t IncrementalSfM::MatchViewsBF(int* best_i, int* best_j) {
 
 }
 
-// TODO: add sequential checkbox in GUI!
 int IncrementalSfM::Initialize(bool sequential) {
     if (map_.views.size() < 2) return -1;
 
@@ -410,14 +413,13 @@ int IncrementalSfM::Initialize(bool sequential) {
     }
 
     size_t best_matches;
-    if (sequential) {
-        best_matches = MatchViewsWindow(&best_i, &best_j, 2, 10, 0);
-    }
-    else {
+    if (sequential && use_window_anchor_) {
+        best_matches = MatchViewsWindow(&best_i, &best_j, 2, 10, 10);
+    } else if (sequential && !use_window_anchor_) {
+        best_matches = MatchViewsSequential(&best_i, &best_j);
+    } else {
         best_matches = MatchViewsBF(&best_i, &best_j);
     }
-
-
 
     std::cout << "[INFO] Initialize using best pair: view " << best_i << " and view " << best_j
         << " with " << best_matches << " matches." << std::endl;
