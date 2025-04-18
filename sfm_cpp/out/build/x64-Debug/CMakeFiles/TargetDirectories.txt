@@ -1,0 +1,4 @@
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/CMakeFiles/ImGui.dir
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/CMakeFiles/sfm_ceres.dir
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/github-repos/sfm-gaussian-splatting/sfm_cpp/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

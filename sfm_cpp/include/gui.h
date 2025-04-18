@@ -16,6 +16,8 @@ public:
 
 private:
     bool should_quit_ = false;
-    void* window_ = nullptr; // actually GLFWwindow*
+    void* window_ = nullptr;
     std::string folder_path_ = "images/";
 };
+
+int GetSelectedMatchingMethod();

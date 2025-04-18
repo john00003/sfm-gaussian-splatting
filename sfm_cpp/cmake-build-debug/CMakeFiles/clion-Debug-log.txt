@@ -1,0 +1,13 @@
+"C:\Program Files\JetBrains\CLion 2024.2.1\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -S C:\github-repos\sfm-gaussian-splatting\sfm_cpp -B C:\github-repos\sfm-gaussian-splatting\sfm_cpp\cmake-build-debug
+CMake Error: The current CMakeCache.txt directory C:/github-repos/sfm-gaussian-splatting/sfm_cpp/cmake-build-debug/_deps/imgui-subbuild/CMakeCache.txt is different than the directory c:/github repos/sfm-gaussian-splatting/sfm_cpp/cmake-build-debug/_deps/imgui-subbuild where CMakeCache.txt was created. This may result in binaries being created in the wrong place. If you are not sure, reedit the CMakeCache.txt
+
+CMake Error at C:/Program Files/JetBrains/CLion 2024.2.1/bin/cmake/win/x64/share/cmake-3.29/Modules/FetchContent.cmake:1702 (message):
+  CMake step for imgui failed: 1
+Call Stack (most recent call first):
+  C:/Program Files/JetBrains/CLion 2024.2.1/bin/cmake/win/x64/share/cmake-3.29/Modules/FetchContent.cmake:1854:EVAL:2 (__FetchContent_directPopulate)
+  C:/Program Files/JetBrains/CLion 2024.2.1/bin/cmake/win/x64/share/cmake-3.29/Modules/FetchContent.cmake:1854 (cmake_language)
+  C:/Program Files/JetBrains/CLion 2024.2.1/bin/cmake/win/x64/share/cmake-3.29/Modules/FetchContent.cmake:2081 (FetchContent_Populate)
+  CMakeLists.txt:18 (FetchContent_MakeAvailable)
+
+
+-- Configuring incomplete, errors occurred!

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sfm_cpp/out/build/x64-Debug/_deps/imgui-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sfm_cpp/out/build/x64-Release/_deps/imgui-src" vcs="Git" />
+  </component>
+</project>
