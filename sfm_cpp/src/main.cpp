@@ -6,6 +6,7 @@
 #include "sfm_system.h"
 
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <atomic>
 #include <string>
@@ -17,6 +18,30 @@
 #include <exiv2/exiv2.hpp>
 #include <filesystem>
 #include <Eigen/Dense>
+
+// Console and save to text output
+class TeeBuf : public std::streambuf {
+    public:
+        TeeBuf(std::streambuf* sb1, std::streambuf* sb2) : sb1(sb1), sb2(sb2) {}
+    
+    protected:
+        int overflow(int c) override {
+            if (c == EOF) return !EOF;
+            int const r1 = sb1->sputc(c);
+            int const r2 = sb2->sputc(c);
+            return (r1 == EOF || r2 == EOF) ? EOF : c;
+        }
+    
+        int sync() override {
+            int const r1 = sb1->pubsync();
+            int const r2 = sb2->pubsync();
+            return (r1 == 0 && r2 == 0) ? 0 : -1;
+        }
+    
+    private:
+        std::streambuf* sb1;
+        std::streambuf* sb2;
+    };
 
 namespace fs = std::filesystem;
 
@@ -228,6 +253,17 @@ void runSfMNoGUI(char* folder, bool sequential) {
 // TODO: add sequential checkbox to gui
 int main(int argc, char** argv)
 {
+    std::ofstream log_file("sfm_log.txt");
+
+    static TeeBuf tee_out(std::cout.rdbuf(), log_file.rdbuf());
+    static TeeBuf tee_err(std::cerr.rdbuf(), log_file.rdbuf());
+
+    std::cout.rdbuf(&tee_out);
+    std::cerr.rdbuf(&tee_err);
+
+    // Sync output to console and sfm_log.txt
+    std::cout << "[INFO] Logging started\n";
+
     bool sequential = true; // TODO: change to default to false
     bool johns_phone = false;
     if (argc > 1) {
