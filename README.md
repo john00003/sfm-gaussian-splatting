@@ -13,6 +13,7 @@ We used Gaussian Splatting [1,2] to visualize create a rendering of our results,
 ## Installation Instructions
 
 ### SfM Installation
+Check the releases tab for a downloadable version. This release packages all of the dependencies the project was built with into .dll files. This version should work out of the box on any Window's machine equipped with a Nvidia graphics card.
 
 ### Gaussian Splatting Training + Viewer Installation
 The Gaussian Splatting repository [2] has complete instructions for installation of the Gaussian Splatting training program, and a visualization tool to view the rendered scene. Follow the installation tutorial (complete with a video tutorial for Windows) in the repository's README.
