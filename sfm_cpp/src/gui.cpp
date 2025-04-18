@@ -58,10 +58,10 @@ void GUIManager::Render(const std::function<void(const std::string&)>& onRunSfM)
     ImGui::Begin("Incremental SfM");
 
     ImGui::Text("A group project by John Tyler and Bob Bu");
+    ImGui::Text("ALBERTA CANADA, APRIL 2025");
+    ImGui::Separator();
     ImGui::Text("jetyler@ualberta.ca | sbu1@ualberta.ca");
     ImGui::Text("Department of Computing Science, University of Alberta");
-    ImGui::Text("https://github.com/john00003/sfm-gaussian-splatting");
-    ImGui::Text("April 2025");
     ImGui::Separator();
 
     ImGui::Text("Input image folder:");
@@ -77,8 +77,17 @@ void GUIManager::Render(const std::function<void(const std::string&)>& onRunSfM)
     ImGui::RadioButton("Window + Anchor", &matching_method, 2);
 
     if (ImGui::Button("Run SfM")) {
+        const char* method_str = nullptr;
+        switch (matching_method) {
+            case 0: method_str = "Brute Force (BF)"; break;
+            case 1: method_str = "Sequential"; break;
+            case 2: method_str = "Window + Anchor"; break;
+        }
+
+        std::cout << "[INFO] Selected Matching Strategy: " << method_str << std::endl;
         onRunSfM(folder_path_);
     }
+
     ImGui::SameLine();
     if (ImGui::Button("Quit")) {
         should_quit_ = true;
