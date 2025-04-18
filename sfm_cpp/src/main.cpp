@@ -349,7 +349,18 @@ int main(int argc, char** argv)
 
                     IncrementalSfM sfm(map);
                     std::cout << "[INFO] Initializing SfM..." << std::endl;
-                    int bestViewId = sfm.Initialize(sequential);
+                    int matching_method = GetSelectedMatchingMethod();
+                    int bestViewId = -1;
+
+                    if (matching_method == 0) {
+                        bestViewId = sfm.Initialize(false); // brute force
+                    } else if (matching_method == 1) {
+                        bestViewId = sfm.Initialize(true);  // sequential
+                    } else if (matching_method == 2) {
+                        bestViewId = sfm.Initialize(true);  // window + anchor uses same entry but switches internal flag
+                        sfm.SetUseWindowAnchor(true);
+                    }
+
                     // TODO: start registering from best views found by intiialize
                     for (int i = bestViewId; i != map.views.size(); ++i) {
                         if (map.views[i].registered) continue;
