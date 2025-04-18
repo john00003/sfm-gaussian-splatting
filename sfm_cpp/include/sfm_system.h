@@ -55,10 +55,12 @@ public:
     size_t MatchViewsBF(int* best_i, int* best_j);
     size_t MatchViewsSequential(int* best_i, int* best_j);
     size_t MatchViewsWindow(int* best_i, int* best_j, int window_size, int anchor_interval, int anchor_window);
+    void SetUseWindowAnchor(bool flag);
 
 private:
     SfMMap& map_;
     cv::Ptr<cv::SIFT> sift_;
     cv::Ptr<cv::cuda::DescriptorMatcher> matcher_;
     std::vector<cv::DMatch> MatchAndFilterKNN(const cv::Mat& desc1, const cv::Mat& desc2, View v1, View v2) const;
+    bool use_window_anchor_ = false;
 };
