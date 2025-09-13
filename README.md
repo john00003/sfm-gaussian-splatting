@@ -1,6 +1,8 @@
 # sfm-gaussian-splatting
 A Github repository for Bob and John's CMPUT 428 (Computer Vision) final project.
 
+**Check out our project presentation [here](https://github.com/john00003/sfm-gaussian-splatting/blob/f4e15652a59e7192f62d4d1a1c5a8d64d651bbd4/CMPUT428%20Final%20Project%20Presentation%20John%20Tyler%20Shijie%20Bu.pdf), or our final report [here](https://github.com/john00003/sfm-gaussian-splatting/blob/f4e15652a59e7192f62d4d1a1c5a8d64d651bbd4/CMPUT%20428%20Final%20Project%20Report%20Bob%20Bu%20John%20Tyler.pdf)!**
+
 We created an incremental Structure-from-Motion (SfM) algorithm similar to COLMAP [3,4] to reconstruct 3D scenes as sparse 3D points clouds. Our algorithm uses elementary techniques taught in CMPUT 428 and Hartley and Zisserman [5].
 
 We used Gaussian Splatting [1,2] to visualize create a rendering of our results, and compared the rendering quality associated with accuracy of the the 3D point clouds used for initialization.
